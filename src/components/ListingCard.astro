@@ -17,7 +17,7 @@ const { slug, displayName, country, city, stateRegion, categories, tags, descrip
 
 const location = [city, stateRegion, country].filter(Boolean).join(', ');
 const topTags = tags.slice(0, 3);
-const searchable = [displayName, country, city, stateRegion, ...tags.map(formatTag)].join(' ').toLowerCase();
+const searchable = [displayName, description, country, city, stateRegion, ...tags.map(formatTag)].join(' ').toLowerCase();
 ---
 
 <a

@@ -16,8 +16,8 @@ The directory is lineage-neutral: Ananda, SRF, Kriya Yoga International, indepen
 
 - **Framework:** Astro (static site generator with content collections)
 - **Hosting:** GitHub Pages
-- **Form handling:** Formspree (free tier, 50 submissions/month)
-- **Automation:** GitHub Actions (Formspree webhook triggers PR creation)
+- **Form handling:** Cloudflare Worker at submit.templeofjoy.org
+- **Automation:** CF Worker triggers GitHub repository_dispatch, GitHub Action creates PR
 - **Newsletter:** Listmonk (existing instance at ../listmonk)
 - **Repository:** Public on GitHub
 
@@ -94,8 +94,8 @@ Tags are predefined with an "Other" free text option. New tags are added to the 
 
 ### What happens behind the scenes
 
-1. Form data submitted to Formspree (free tier)
-2. Formspree webhook triggers a GitHub Action
+1. Form data submitted to Cloudflare Worker (submit.templeofjoy.org)
+2. Worker triggers GitHub repository_dispatch event
 3. GitHub Action creates a markdown file with listing data and opens a PR
 4. Maintainer reviews the PR:
    - Checks content for fit
@@ -173,7 +173,7 @@ Each file contains structured frontmatter (all fields) and a markdown body (conn
 
 - Home, Directory, Profile, Submit, About pages
 - Listing profiles with all required and optional fields
-- Formspree + GitHub Actions submission pipeline
+- Cloudflare Worker + GitHub Actions submission pipeline
 - Category/country/tag filtering and search
 - Listmonk newsletter subscribe form in footer
 - Responsive, mobile-first design

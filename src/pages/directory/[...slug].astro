@@ -119,6 +119,8 @@ const availableForLabels: Record<string, string> = {
           <a
             href={contactHref(data.contactMethod, data.contactValue)}
             class="btn btn-primary"
+            target={data.contactMethod !== 'email' ? '_blank' : undefined}
+            rel={data.contactMethod !== 'email' ? 'noopener noreferrer' : undefined}
           >
             {contactLabel(data.contactMethod)}
           </a>

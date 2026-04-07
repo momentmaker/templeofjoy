@@ -1,0 +1,7 @@
+name = "temple-of-joy-submit"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+routes = [
+  { pattern = "submit.templeofjoy.org", custom_domain = true }
+]

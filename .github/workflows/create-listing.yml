@@ -1,10 +1,12 @@
 name: Create Listing from Submission
 
 on:
+  repository_dispatch:
+    types: [new-listing]
   workflow_dispatch:
     inputs:
       submission_json:
-        description: 'Paste the Formspree submission JSON'
+        description: 'Paste the submission JSON'
         required: true
         type: string
 
@@ -23,12 +25,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const data = JSON.parse(process.env.SUBMISSION_JSON);
+            const raw = process.env.SUBMISSION_JSON;
+            const data = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(context.payload.client_payload));
 
-            const slug = data.displayName
+            const baseSlug = data.displayName
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, '-')
               .replace(/^-|-$/g, '');
+
+            const fs = require('fs');
+            const path = require('path');
+
+            let slug = baseSlug;
+            let counter = 1;
+            while (fs.existsSync(`src/content/devotees/${slug}.md`)) {
+              slug = `${baseSlug}-${counter}`;
+              counter++;
+            }
 
             const categories = Array.isArray(data.categories)
               ? data.categories
@@ -44,47 +57,46 @@ jobs:
 
             const links = [];
             for (let i = 1; i <= 4; i++) {
-              const label = data[`linkLabel${i}`];
-              const url = data[`linkUrl${i}`];
+              const label = data[`link${i}Label`];
+              const url = data[`link${i}Url`];
               if (label && url) links.push({ label, url });
             }
 
             const today = new Date().toISOString().split('T')[0];
+            const esc = (s) => s ? s.replace(/"/g, '\\"') : '';
 
             let frontmatter = `---\n`;
-            frontmatter += `displayName: "${data.displayName}"\n`;
-            frontmatter += `country: "${data.country}"\n`;
-            if (data.city) frontmatter += `city: "${data.city}"\n`;
-            if (data.stateRegion) frontmatter += `stateRegion: "${data.stateRegion}"\n`;
+            frontmatter += `displayName: "${esc(data.displayName)}"\n`;
+            frontmatter += `country: "${esc(data.country)}"\n`;
+            if (data.city) frontmatter += `city: "${esc(data.city)}"\n`;
+            if (data.stateRegion) frontmatter += `stateRegion: "${esc(data.stateRegion)}"\n`;
             frontmatter += `categories: [${categories.map(c => `"${c}"`).join(', ')}]\n`;
             frontmatter += `tags: [${tags.map(t => `"${t}"`).join(', ')}]\n`;
-            frontmatter += `description: "${data.description.replace(/"/g, '\\"')}"\n`;
+            frontmatter += `description: "${esc(data.description)}"\n`;
             frontmatter += `contactMethod: "${data.contactMethod}"\n`;
-            frontmatter += `contactValue: "${data.contactValue}"\n`;
-            if (data.photoUrl) frontmatter += `photo: "${data.photoUrl}"\n`;
-            if (data.communityLineage) frontmatter += `communityLineage: "${data.communityLineage}"\n`;
-            if (data.websiteUrl) frontmatter += `websiteUrl: "${data.websiteUrl}"\n`;
+            frontmatter += `contactValue: "${esc(data.contactValue)}"\n`;
+            if (data.photoUrl) frontmatter += `photo: "${esc(data.photoUrl)}"\n`;
+            if (data.communityLineage) frontmatter += `communityLineage: "${esc(data.communityLineage)}"\n`;
+            if (data.websiteUrl) frontmatter += `websiteUrl: "${esc(data.websiteUrl)}"\n`;
             if (links.length > 0) {
               frontmatter += `additionalLinks:\n`;
               links.forEach(l => {
-                frontmatter += `  - label: "${l.label}"\n`;
-                frontmatter += `    url: "${l.url}"\n`;
+                frontmatter += `  - label: "${esc(l.label)}"\n`;
+                frontmatter += `    url: "${esc(l.url)}"\n`;
               });
             }
             if (availableFor.length > 0) {
               frontmatter += `availableFor: [${availableFor.map(a => `"${a}"`).join(', ')}]\n`;
             }
             if (data.openToMentorship === 'true') frontmatter += `openToMentorship: true\n`;
-            if (data.guidingQuote) frontmatter += `guidingQuote: "${data.guidingQuote.replace(/"/g, '\\"')}"\n`;
-            if (data.joyInAction) frontmatter += `joyInAction: "${data.joyInAction.replace(/"/g, '\\"')}"\n`;
+            if (data.guidingQuote) frontmatter += `guidingQuote: "${esc(data.guidingQuote)}"\n`;
+            if (data.joyInAction) frontmatter += `joyInAction: "${esc(data.joyInAction)}"\n`;
             frontmatter += `dateAdded: ${today}\n`;
             frontmatter += `---\n\n`;
 
             const body = data.connectionToTeachings || '';
             const content = frontmatter + body + '\n';
 
-            const fs = require('fs');
-            const path = require('path');
             const filePath = `src/content/devotees/${slug}.md`;
             const dir = path.dirname(filePath);
             fs.mkdirSync(dir, { recursive: true });
@@ -96,29 +108,41 @@ jobs:
             core.setOutput('display_name', data.displayName);
             core.setOutput('is_update', (data.isUpdate === 'true').toString());
         env:
-          SUBMISSION_JSON: ${{ inputs.submission_json }}
+          SUBMISSION_JSON: ${{ inputs.submission_json || '' }}
 
       - name: Create branch, commit, and push
         run: |
           git config user.name "Temple of Joy Bot"
           git config user.email "bot@templeofjoy.org"
-          git checkout -b "${{ steps.create.outputs.branch_name }}"
-          git add "${{ steps.create.outputs.file_path }}"
-          git commit -m "feat: add listing for ${{ steps.create.outputs.display_name }}"
-          git push origin "${{ steps.create.outputs.branch_name }}"
+          git checkout -b "$BRANCH_NAME"
+          git add "$FILE_PATH"
+          git commit -m "feat: add listing for $DISPLAY_NAME"
+          git push origin "$BRANCH_NAME"
+        env:
+          BRANCH_NAME: ${{ steps.create.outputs.branch_name }}
+          FILE_PATH: ${{ steps.create.outputs.file_path }}
+          DISPLAY_NAME: ${{ steps.create.outputs.display_name }}
 
       - name: Create pull request
         uses: actions/github-script@v7
         with:
           script: |
-            const isUpdate = '${{ steps.create.outputs.is_update }}' === 'true';
+            const displayName = process.env.DISPLAY_NAME;
+            const filePath = process.env.FILE_PATH;
+            const branchName = process.env.BRANCH_NAME;
+            const isUpdate = process.env.IS_UPDATE === 'true';
             const prefix = isUpdate ? 'Update' : 'New';
 
             await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `${prefix} listing: ${{ steps.create.outputs.display_name }}`,
-              body: `## ${prefix} Listing Submission\n\n**Name:** ${{ steps.create.outputs.display_name }}\n**File:** \`${{ steps.create.outputs.file_path }}\`\n\nReview the listing content and merge when ready. The site will auto-deploy.`,
-              head: '${{ steps.create.outputs.branch_name }}',
+              title: `${prefix} listing: ${displayName}`,
+              body: `## ${prefix} Listing Submission\n\n**Name:** ${displayName}\n**File:** \`${filePath}\`\n\nReview the listing content and merge when ready. The site will auto-deploy.`,
+              head: branchName,
               base: 'main',
             });
+        env:
+          DISPLAY_NAME: ${{ steps.create.outputs.display_name }}
+          FILE_PATH: ${{ steps.create.outputs.file_path }}
+          BRANCH_NAME: ${{ steps.create.outputs.branch_name }}
+          IS_UPDATE: ${{ steps.create.outputs.is_update }}

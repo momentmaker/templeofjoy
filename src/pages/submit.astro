@@ -17,9 +17,11 @@ import { tagsByCategory, formatTag } from '../data/tags';
         </p>
       </header>
 
-      <form id="submit-form" class="listing-form" novalidate>
-        <input type="hidden" name="_subject" value="New Temple of Joy Listing" />
-
+      <form
+        id="submit-form"
+        class="listing-form"
+        data-submit-url="https://submit.templeofjoy.org"
+      >
         <fieldset class="form-section">
           <legend>About You</legend>
 
@@ -460,6 +462,11 @@ import { tagsByCategory, formatTag } from '../data/tags';
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     const formData = new FormData(form);
     const data: Record<string, unknown> = {};
 
@@ -473,12 +480,9 @@ import { tagsByCategory, formatTag } from '../data/tags';
     }
 
     try {
-      const response = await fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+      const response = await fetch(form.dataset.submitUrl!, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 

@@ -58,32 +58,34 @@ const recentListings = [...allDevotees]
     </section>
   )}
 
-  <section class="listings-section section">
-    <div class="container">
-      <header class="section-header">
-        <h2>Recent Listings</h2>
-        <p class="section-subtitle">Devotees sharing their gifts across the world</p>
-      </header>
-      <div class="listings-grid">
-        {recentListings.map((devotee) => (
-          <ListingCard
-            slug={devotee.id}
-            displayName={devotee.data.displayName}
-            country={devotee.data.country}
-            city={devotee.data.city}
-            stateRegion={devotee.data.stateRegion}
-            categories={devotee.data.categories}
-            tags={devotee.data.tags}
-            description={devotee.data.description}
-            photo={devotee.data.photo}
-          />
-        ))}
+  {recentListings.length > 0 && (
+    <section class="listings-section section">
+      <div class="container">
+        <header class="section-header">
+          <h2>Recent Listings</h2>
+          <p class="section-subtitle">Devotees sharing their gifts across the world</p>
+        </header>
+        <div class="listings-grid">
+          {recentListings.map((devotee) => (
+            <ListingCard
+              slug={devotee.id}
+              displayName={devotee.data.displayName}
+              country={devotee.data.country}
+              city={devotee.data.city}
+              stateRegion={devotee.data.stateRegion}
+              categories={devotee.data.categories}
+              tags={devotee.data.tags}
+              description={devotee.data.description}
+              photo={devotee.data.photo}
+            />
+          ))}
+        </div>
+        <div class="section-footer">
+          <a href="/directory/" class="btn btn-outline">View All Listings</a>
+        </div>
       </div>
-      <div class="section-footer">
-        <a href="/directory/" class="btn btn-outline">View All Listings</a>
-      </div>
-    </div>
-  </section>
+    </section>
+  )}
 
   {featuredStoryDevotee && (
     <section class="story-section section">
