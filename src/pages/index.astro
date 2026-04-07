@@ -1,10 +1,282 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ListingCard from '../components/ListingCard.astro';
+
+const allDevotees = await getCollection('devotees');
+
+const devoteesWithQuote = allDevotees.filter((d) => d.data.guidingQuote);
+const featuredQuoteDevotee =
+  devoteesWithQuote.length > 0
+    ? devoteesWithQuote[Math.floor(Math.random() * devoteesWithQuote.length)]
+    : null;
+
+const devoteesWithStory = allDevotees.filter((d) => d.data.joyInAction);
+const featuredStoryDevotee =
+  devoteesWithStory.length > 0
+    ? devoteesWithStory[Math.floor(Math.random() * devoteesWithStory.length)]
+    : null;
+
+const recentListings = [...allDevotees]
+  .sort((a, b) => b.data.dateAdded.getTime() - a.data.dateAdded.getTime())
+  .slice(0, 6);
 ---
 
-<BaseLayout title="Home">
-  <div class="container section">
-    <h1>Temple of Joy</h1>
-    <p>Coming soon.</p>
-  </div>
+<BaseLayout
+  title="Home"
+  description="A community directory for devotees of Paramhansa Yogananda sharing their gifts through practice, creativity, and service."
+>
+  <section class="hero">
+    <div class="container hero-inner">
+      <h1 class="hero-title">Temple of Joy</h1>
+      <p class="hero-tagline">Joy expressed through service</p>
+      <p class="hero-description">
+        A living directory of devotees of Paramhansa Yogananda sharing their
+        gifts with the world — through practice, creative expression, and
+        heartfelt service.
+      </p>
+      <div class="hero-actions">
+        <a href="/directory/" class="btn btn-primary">Browse Directory</a>
+        <a href="/submit/" class="btn btn-outline">Share Your Gifts</a>
+      </div>
+    </div>
+  </section>
+
+  {featuredQuoteDevotee && (
+    <section class="quote-section section">
+      <div class="container">
+        <blockquote class="featured-quote">
+          <p class="quote-text">&ldquo;{featuredQuoteDevotee.data.guidingQuote}&rdquo;</p>
+          <footer class="quote-attribution">
+            &mdash;{' '}
+            <a href={`/directory/${featuredQuoteDevotee.id}/`} class="quote-link">
+              {featuredQuoteDevotee.data.displayName}
+            </a>
+          </footer>
+        </blockquote>
+      </div>
+    </section>
+  )}
+
+  <section class="listings-section section">
+    <div class="container">
+      <header class="section-header">
+        <h2>Recent Listings</h2>
+        <p class="section-subtitle">Devotees sharing their gifts across the world</p>
+      </header>
+      <div class="listings-grid">
+        {recentListings.map((devotee) => (
+          <ListingCard
+            slug={devotee.id}
+            displayName={devotee.data.displayName}
+            country={devotee.data.country}
+            city={devotee.data.city}
+            stateRegion={devotee.data.stateRegion}
+            categories={devotee.data.categories}
+            tags={devotee.data.tags}
+            description={devotee.data.description}
+            photo={devotee.data.photo}
+          />
+        ))}
+      </div>
+      <div class="section-footer">
+        <a href="/directory/" class="btn btn-outline">View All Listings</a>
+      </div>
+    </div>
+  </section>
+
+  {featuredStoryDevotee && (
+    <section class="story-section section">
+      <div class="container">
+        <header class="section-header">
+          <h2>Joy in Action</h2>
+        </header>
+        <div class="story-box">
+          <p class="story-text">{featuredStoryDevotee.data.joyInAction}</p>
+          <p class="story-attribution">
+            &mdash;{' '}
+            <a href={`/directory/${featuredStoryDevotee.id}/`} class="story-link">
+              {featuredStoryDevotee.data.displayName}
+            </a>
+          </p>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="cta-section section">
+    <div class="container cta-inner">
+      <h2>Share Your Gifts</h2>
+      <p class="cta-description">
+        Are you a devotee offering something to the community? Add your listing
+        and let others find you.
+      </p>
+      <a href="/submit/" class="btn btn-primary">Submit Your Listing</a>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, var(--color-cream) 0%, var(--color-stone) 100%);
+    padding: var(--space-3xl) 0;
+  }
+
+  .hero-inner {
+    text-align: center;
+    max-width: 700px;
+    margin-inline: auto;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: var(--color-navy);
+    margin-bottom: var(--space-sm);
+  }
+
+  .hero-tagline {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.375rem;
+    color: var(--color-ochre);
+    margin-bottom: var(--space-lg);
+  }
+
+  .hero-description {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--color-navy);
+    margin-bottom: var(--space-2xl);
+    opacity: 0.85;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-md);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .quote-section {
+    text-align: center;
+  }
+
+  .featured-quote {
+    margin: 0 auto;
+    max-width: 620px;
+    border: none;
+    padding: 0;
+  }
+
+  .quote-text {
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: 1.375rem;
+    line-height: 1.65;
+    color: var(--color-navy);
+    margin-bottom: var(--space-md);
+  }
+
+  .quote-attribution {
+    font-size: 0.9375rem;
+    color: var(--color-sage);
+  }
+
+  .quote-link {
+    color: var(--color-ochre);
+    text-decoration: none;
+  }
+
+  .quote-link:hover {
+    text-decoration: underline;
+  }
+
+  .listings-section {
+    background: var(--color-stone);
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+  }
+
+  .section-subtitle {
+    margin-top: var(--space-sm);
+    color: var(--color-sage);
+    font-size: 1.0625rem;
+  }
+
+  .listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .section-footer {
+    text-align: center;
+    margin-top: var(--space-2xl);
+  }
+
+  .story-section {
+    background: var(--color-cream);
+  }
+
+  .story-box {
+    background: var(--color-stone);
+    border-left: 4px solid var(--color-ochre);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl) var(--space-2xl);
+    max-width: 680px;
+    margin-inline: auto;
+  }
+
+  .story-text {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--color-navy);
+    margin-bottom: var(--space-md);
+  }
+
+  .story-attribution {
+    font-size: 0.9375rem;
+    color: var(--color-sage);
+    margin: 0;
+  }
+
+  .story-link {
+    color: var(--color-ochre);
+    text-decoration: none;
+  }
+
+  .story-link:hover {
+    text-decoration: underline;
+  }
+
+  .cta-section {
+    background: var(--color-stone);
+  }
+
+  .cta-inner {
+    text-align: center;
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  .cta-description {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-navy);
+    margin-bottom: var(--space-xl);
+    opacity: 0.85;
+  }
+
+  @media (max-width: 768px) {
+    .listings-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .story-box {
+      padding: var(--space-lg);
+    }
+  }
+</style>
