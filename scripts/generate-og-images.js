@@ -53,8 +53,32 @@ function escapeXml(str) {
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-function formatTag(tag) {
-  return tag.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+async function downloadAsBase64(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const contentType = res.headers.get('content-type') || 'image/png';
+    const buffer = await res.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+    return `data:${contentType};base64,${base64}`;
+  } catch {
+    return null;
+  }
+}
+
+function avatarCircleSvg(color, initials) {
+  return `<circle cx="200" cy="280" r="100" fill="${color.bg}"/>
+  <text x="200" y="300" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="${color.text}">${escapeXml(initials)}</text>`;
+}
+
+function photoCircleSvg(dataUri) {
+  return `<defs>
+    <clipPath id="avatar-clip">
+      <circle cx="200" cy="280" r="100"/>
+    </clipPath>
+  </defs>
+  <circle cx="200" cy="280" r="102" fill="#C8B88A"/>
+  <image href="${dataUri}" x="100" y="180" width="200" height="200" clip-path="url(#avatar-clip)" preserveAspectRatio="xMidYMid slice"/>`;
 }
 
 const files = readdirSync(devoteesDir).filter(f => f.endsWith('.md'));
@@ -70,13 +94,20 @@ for (const file of files) {
   const description = data.description || '';
   const truncDesc = description.length > 100 ? description.slice(0, 97) + '...' : description;
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  let avatarSvg;
+  if (data.photo) {
+    const dataUri = await downloadAsBase64(data.photo);
+    avatarSvg = dataUri ? photoCircleSvg(dataUri) : avatarCircleSvg(color, initials);
+  } else {
+    avatarSvg = avatarCircleSvg(color, initials);
+  }
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1200 630" fill="none">
   <rect width="1200" height="630" fill="#FFFBEE"/>
   <rect x="0" y="0" width="1200" height="6" fill="#C4762B"/>
   <rect x="0" y="624" width="1200" height="6" fill="#073763"/>
 
-  <circle cx="200" cy="280" r="100" fill="${color.bg}"/>
-  <text x="200" y="300" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="bold" fill="${color.text}">${escapeXml(initials)}</text>
+  ${avatarSvg}
 
   <text x="380" y="240" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#073763">${escapeXml(name)}</text>
   <text x="380" y="285" font-family="Inter, system-ui, sans-serif" font-size="22" fill="#7D8B6E">${escapeXml(location)}</text>
