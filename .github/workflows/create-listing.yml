@@ -139,7 +139,7 @@ jobs:
               title: `${prefix} listing: ${displayName}`,
               body: `## ${prefix} Listing Submission\n\n**Name:** ${displayName}\n**File:** \`${filePath}\`\n\nReview the listing content and merge when ready. The site will auto-deploy.`,
               head: branchName,
-              base: 'main',
+              base: 'master',
             });
         env:
           DISPLAY_NAME: ${{ steps.create.outputs.display_name }}
