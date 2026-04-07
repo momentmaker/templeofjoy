@@ -105,6 +105,16 @@ async function handleSubscribe(request, env) {
   if (!createRes.ok) {
     const text = await createRes.text();
     if (text.includes('already exists')) {
+      await fetch(`${env.LISTMONK_URL}/api/subscribers/lists`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          emails: [body.email],
+          list_ids: [listId],
+          action: 'add',
+          status: 'confirmed',
+        }),
+      });
       return Response.json({ ok: true }, { headers: corsHeaders(request) });
     }
     console.error(`Listmonk API ${createRes.status}: ${text}`);
