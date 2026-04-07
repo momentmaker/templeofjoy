@@ -22,6 +22,7 @@ const devotees = allDevotees.sort(
         <p class="directory-subtitle">
           Devotees sharing their gifts across the world
         </p>
+        <button type="button" class="btn-lucky" id="feeling-lucky">Discover a Devotee</button>
       </header>
 
       <SearchBar />
@@ -60,6 +61,25 @@ const devotees = allDevotees.sort(
     margin-top: var(--space-sm);
     color: var(--color-sage);
     font-size: 1.125rem;
+  }
+
+  .btn-lucky {
+    margin-top: var(--space-lg);
+    padding: var(--space-sm) var(--space-xl);
+    background: transparent;
+    color: var(--color-ochre);
+    border: 1.5px solid var(--color-ochre);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .btn-lucky:hover {
+    background: var(--color-ochre);
+    color: var(--color-cream);
   }
 
   .grid {
@@ -143,4 +163,12 @@ const devotees = allDevotees.sort(
   searchInput?.addEventListener('input', applyFilters);
   countrySelect?.addEventListener('change', applyFilters);
   tagSelect?.addEventListener('change', applyFilters);
+
+  document.getElementById('feeling-lucky')?.addEventListener('click', () => {
+    if (!grid) return;
+    const cards = Array.from(grid.querySelectorAll<HTMLAnchorElement>('.listing-card:not([hidden])'));
+    if (cards.length === 0) return;
+    const random = cards[Math.floor(Math.random() * cards.length)];
+    window.location.href = random.href;
+  });
 </script>

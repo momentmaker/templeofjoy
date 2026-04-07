@@ -37,3 +37,15 @@ Connecting newer seekers with experienced devotees who opted in to mentor.
 
 ## Multilingual Support
 Hindi, Italian (large Ananda community), Spanish, and other languages for global inclusion.
+
+## "I Know This Person" Vouching
+A trust signal on profiles. Visitors can click "I know [Name]" and submit a brief note ("We practice together at Ananda Austin"). Creates a GitHub issue for review. Once approved, profile shows "Vouched for by N community members." Not reviews or ratings -- quiet trust from real connections.
+
+## "This Week in Joy" Auto-Newsletter
+GitHub Action on a weekly cron. Pulls latest listings, picks a random Joy in Action story, formats a beautiful email, sends via listmonk. Zero manual effort. The community gets a weekly heartbeat.
+
+## Devotee Count Badge on Homepage
+Dynamic count at build time: "N devotees across M countries." Makes the community feel real and growing. Every merge updates the number.
+
+## Auto-Generated Profile Share Cards
+Personalized OG images per devotee for social sharing. When someone shares their profile URL, the preview shows their name, avatar color, location, and tags instead of the generic site image.
