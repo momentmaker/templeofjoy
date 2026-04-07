@@ -105,16 +105,26 @@ async function handleSubscribe(request, env) {
   if (!createRes.ok) {
     const text = await createRes.text();
     if (text.includes('already exists')) {
-      await fetch(`${env.LISTMONK_URL}/api/subscribers/lists`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          emails: [body.email],
-          list_ids: [listId],
-          action: 'add',
-          status: 'confirmed',
-        }),
-      });
+      const lookupRes = await fetch(
+        `${env.LISTMONK_URL}/api/subscribers?query=subscribers.email='${encodeURIComponent(body.email)}'&per_page=1`,
+        { headers },
+      );
+      if (lookupRes.ok) {
+        const lookupData = await lookupRes.json();
+        const subId = lookupData?.data?.results?.[0]?.id;
+        if (subId) {
+          await fetch(`${env.LISTMONK_URL}/api/subscribers/lists`, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({
+              ids: [subId],
+              action: 'add',
+              target_list_ids: [listId],
+              status: 'confirmed',
+            }),
+          });
+        }
+      }
       return Response.json({ ok: true }, { headers: corsHeaders(request) });
     }
     console.error(`Listmonk API ${createRes.status}: ${text}`);
