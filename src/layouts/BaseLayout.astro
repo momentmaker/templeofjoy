@@ -27,19 +27,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
 
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:title" content={`${title} | Temple of Joy`} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:site_name" content="Temple of Joy" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={`${title} | Temple of Joy`} />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
-    <title>{title} | Temple of Joy</title>
+    <title>{title}</title>
   </head>
   <body>
     <Header />
