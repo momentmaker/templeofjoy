@@ -1,0 +1,496 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { countries } from '../data/countries';
+import { tagsByCategory, formatTag } from '../data/tags';
+---
+
+<BaseLayout
+  title="Submit Your Listing"
+  description="Share your gifts with the Temple of Joy community directory."
+>
+  <section class="section">
+    <div class="container form-container">
+      <header class="page-header">
+        <h1>Share Your Gifts</h1>
+        <p class="page-subtitle">
+          Join the directory and let fellow devotees find you.
+        </p>
+      </header>
+
+      <form id="submit-form" class="listing-form" novalidate>
+        <input type="hidden" name="_subject" value="New Temple of Joy Listing" />
+
+        <fieldset class="form-section">
+          <legend>About You</legend>
+
+          <div class="field">
+            <label for="displayName">Display Name <span class="required">*</span></label>
+            <input type="text" id="displayName" name="displayName" required />
+          </div>
+
+          <div class="field">
+            <label for="country">Country <span class="required">*</span></label>
+            <select id="country" name="country" required>
+              <option value="">Select your country</option>
+              {countries.map((c) => (
+                <option value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="city">City</label>
+              <input type="text" id="city" name="city" />
+            </div>
+            <div class="field">
+              <label for="stateRegion">State / Region</label>
+              <input type="text" id="stateRegion" name="stateRegion" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="communityLineage">Community / Lineage</label>
+            <input
+              type="text"
+              id="communityLineage"
+              name="communityLineage"
+              placeholder="e.g. Ananda, Self-Realization Fellowship"
+            />
+          </div>
+
+          <div class="field">
+            <label for="photoUrl">Photo URL</label>
+            <input type="url" id="photoUrl" name="photoUrl" placeholder="https://" />
+            <p class="field-hint">
+              Paste a link to a photo hosted online, or email us a photo after submitting.
+            </p>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend>Your Path</legend>
+
+          <div class="field">
+            <label for="connectionToTeachings">
+              Your connection to the teachings <span class="required">*</span>
+            </label>
+            <textarea id="connectionToTeachings" name="connectionToTeachings" rows="5" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="guidingQuote">A guiding quote (optional)</label>
+            <textarea id="guidingQuote" name="guidingQuote" rows="2" placeholder="A line from scripture, Master's words, or your own heart"></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend>Your Offerings</legend>
+
+          <div class="field">
+            <fieldset class="inline-fieldset">
+              <legend>Categories <span class="required">*</span></legend>
+              <div class="checkbox-group">
+                {(['Practice', 'Creative', 'Service'] as const).map((cat) => (
+                  <label class="checkbox-label">
+                    <input
+                      type="checkbox"
+                      name="categories"
+                      value={cat}
+                      data-category-toggle={cat}
+                    />
+                    {cat}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          {(['Practice', 'Creative', 'Service'] as const).map((cat) => (
+            <div class="tag-group" id={`tags-${cat}`} hidden>
+              <fieldset class="inline-fieldset">
+                <legend>{cat} Tags</legend>
+                <div class="checkbox-group">
+                  {tagsByCategory[cat].map((tag) => (
+                    <label class="checkbox-label">
+                      <input type="checkbox" name="tags" value={tag} />
+                      {formatTag(tag)}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            </div>
+          ))}
+
+          <div class="field">
+            <label for="otherTags">Other tags</label>
+            <input type="text" id="otherTags" name="otherTags" placeholder="Comma-separated" />
+          </div>
+
+          <div class="field">
+            <label for="description">
+              Describe your offerings <span class="required">*</span>
+            </label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="joyInAction">Joy in action — a story (optional)</label>
+            <textarea
+              id="joyInAction"
+              name="joyInAction"
+              rows="4"
+              placeholder="Share a moment when your offering created a spark of joy"
+            ></textarea>
+          </div>
+
+          <div class="field">
+            <fieldset class="inline-fieldset">
+              <legend>Available for</legend>
+              <div class="checkbox-group">
+                {(['in-person', 'virtual', 'travel', 'collaboration'] as const).map((opt) => (
+                  <label class="checkbox-label">
+                    <input type="checkbox" name="availableFor" value={opt} />
+                    {formatTag(opt)}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          <div class="field">
+            <label class="checkbox-label standalone">
+              <input type="checkbox" name="openToMentorship" value="true" />
+              I am open to mentorship
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend>Contact</legend>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="contactMethod">
+                Preferred contact method <span class="required">*</span>
+              </label>
+              <select id="contactMethod" name="contactMethod" required>
+                <option value="">Select one</option>
+                <option value="website">Website</option>
+                <option value="email">Email</option>
+                <option value="social">Social profile</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="contactValue">
+                Contact value <span class="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="contactValue"
+                name="contactValue"
+                required
+                placeholder="URL, email address, or handle"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="websiteUrl">Website URL</label>
+            <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://" />
+          </div>
+
+          <div class="additional-links">
+            <p class="field-label">Additional links (optional)</p>
+            {[1, 2, 3, 4].map((n) => (
+              <div class="link-row">
+                <input type="text" name={`link${n}Label`} placeholder={`Label ${n}`} />
+                <input type="url" name={`link${n}Url`} placeholder="https://" />
+              </div>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset class="form-section">
+          <legend>Existing Listing</legend>
+          <label class="checkbox-label standalone">
+            <input type="checkbox" name="isUpdate" value="true" />
+            I am updating an existing listing
+          </label>
+        </fieldset>
+
+        <div id="form-error" class="form-error" hidden>
+          <p>Something went wrong. Please try again or email us directly.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Submit Listing</button>
+        </div>
+      </form>
+
+      <div id="thank-you" class="thank-you" hidden>
+        <h2>Thank you!</h2>
+        <p>Your listing has been submitted. We'll review it and add it to the directory soon.</p>
+        <a href="/directory/" class="btn btn-outline">Browse the Directory</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .form-container {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+  }
+
+  .page-subtitle {
+    margin-top: var(--space-sm);
+    color: var(--color-sage);
+    font-size: 1.0625rem;
+  }
+
+  .listing-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+  }
+
+  .form-section {
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
+    margin: 0;
+  }
+
+  .form-section legend {
+    font-family: var(--font-heading);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-navy);
+    padding: 0 var(--space-sm);
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-top: var(--space-lg);
+  }
+
+  .field:first-of-type {
+    margin-top: var(--space-md);
+  }
+
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+  }
+
+  .field-row .field {
+    margin-top: 0;
+  }
+
+  label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-navy);
+  }
+
+  .field-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-navy);
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+  }
+
+  .required {
+    color: var(--color-ochre);
+  }
+
+  input[type='text'],
+  input[type='url'],
+  input[type='email'],
+  select,
+  textarea {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    border: 1px solid var(--color-gold);
+    border-radius: var(--radius-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-white);
+    color: var(--color-navy);
+    transition: border-color 0.15s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-ochre);
+    box-shadow: 0 0 0 2px rgba(196, 118, 43, 0.15);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .field-hint {
+    font-size: 0.8125rem;
+    color: var(--color-sage);
+    margin: 0;
+  }
+
+  .inline-fieldset {
+    border: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .inline-fieldset legend {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-navy);
+    padding: 0;
+    margin-bottom: var(--space-sm);
+  }
+
+  .checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm) var(--space-lg);
+    margin-top: var(--space-sm);
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    cursor: pointer;
+  }
+
+  .checkbox-label.standalone {
+    margin-top: var(--space-sm);
+  }
+
+  .tag-group {
+    margin-top: var(--space-md);
+  }
+
+  .additional-links {
+    margin-top: var(--space-lg);
+  }
+
+  .link-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  .form-error {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    padding: var(--space-md);
+    color: #b91c1c;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: center;
+    padding-bottom: var(--space-lg);
+  }
+
+  .thank-you {
+    text-align: center;
+    padding: var(--space-3xl) 0;
+  }
+
+  .thank-you h2 {
+    color: var(--color-navy);
+    margin-bottom: var(--space-md);
+  }
+
+  .thank-you p {
+    color: var(--color-sage);
+    margin-bottom: var(--space-xl);
+    font-size: 1.0625rem;
+  }
+
+  @media (max-width: 600px) {
+    .field-row {
+      grid-template-columns: 1fr;
+    }
+
+    .link-row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const categoryToggles = document.querySelectorAll<HTMLInputElement>('[data-category-toggle]');
+
+  categoryToggles.forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const cat = checkbox.dataset.categoryToggle;
+      const tagGroup = document.getElementById(`tags-${cat}`);
+      if (tagGroup) {
+        tagGroup.hidden = !checkbox.checked;
+      }
+    });
+  });
+
+  const form = document.getElementById('submit-form') as HTMLFormElement | null;
+  const thankYou = document.getElementById('thank-you') as HTMLElement | null;
+  const formError = document.getElementById('form-error') as HTMLElement | null;
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const data: Record<string, unknown> = {};
+
+    for (const [key, value] of formData.entries()) {
+      if (key in data) {
+        const existing = data[key];
+        data[key] = Array.isArray(existing) ? [...existing, value] : [existing, value];
+      } else {
+        data[key] = value;
+      }
+    }
+
+    try {
+      const response = await fetch('https://formspree.io/f/YOUR_FORMSPREE_FORM_ID', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        form.hidden = true;
+        if (thankYou) thankYou.hidden = false;
+      } else {
+        throw new Error(`Response status ${response.status}`);
+      }
+    } catch {
+      if (formError) formError.hidden = false;
+      alert('Something went wrong submitting the form. Please try again.');
+    }
+  });
+</script>
