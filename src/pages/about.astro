@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="About"
+  description="Learn about Temple of Joy — a community directory for devotees of Paramhansa Yogananda sharing their gifts."
+>
+  <section class="section">
+    <div class="container content">
+
+      <header class="page-header">
+        <h1>About Temple of Joy</h1>
+      </header>
+
+      <article class="prose">
+
+        <h2>The Meaning</h2>
+        <p>
+          The <em class="ochre">temple</em> is not a building. It is the body — the instrument
+          through which the divine expresses itself in the world. And <em class="ochre">joy</em>
+          is not a feeling to be chased. It is the essence of what happens when we offer
+          ourselves fully in service, when our unique gifts meet the needs of others.
+        </p>
+        <p>
+          Temple of Joy is a name that holds both: the sacredness of who we are and
+          the happiness that flows from living that truth outward.
+        </p>
+
+        <h2>Why This Exists</h2>
+        <p>
+          Devotees of Paramhansa Yogananda are everywhere — in hundreds of countries,
+          in every kind of city and countryside. They are musicians and healers, writers
+          and teachers, builders and listeners. And yet it has always been hard for us
+          to find each other.
+        </p>
+        <p>
+          Temple of Joy bridges that gap. It is a living directory, not bound to any
+          single community or ashram, that welcomes devotees across lineages. Whether
+          you trained at an Ananda center, a Self-Realization Fellowship temple, or
+          found the teachings on your own — if the path resonates with you, you belong
+          here.
+        </p>
+
+        <h2>How It Started</h2>
+        <p>
+          This project was born on a drive home from a retreat. A conversation about
+          how hard it is to find a fellow devotee who also happens to be a skilled
+          graphic designer, a yoga teacher, a sound healer, or a carpenter willing to
+          offer seva. The idea was simple: what if we had a place to say "here I am,
+          and here is what I offer"?
+        </p>
+        <p>
+          That conversation became this directory.
+        </p>
+
+        <h2>What This Is Not</h2>
+        <p>
+          Temple of Joy is not a marketplace. There are no prices, no transactions, no
+          ratings, no reviews. It is not a platform designed to compete or to monetize.
+          It is simply a way of making the invisible visible — of letting devotees know
+          that others like them exist, and that their gifts are wanted.
+        </p>
+
+        <h2>Join Us</h2>
+        <p>
+          If you are a devotee with something to offer — a practice, a creative gift,
+          a skill, or simply a willingness to serve — we would love to have you in the
+          directory.
+        </p>
+        <p>
+          <a href="/submit/" class="btn btn-primary">Submit Your Listing</a>
+        </p>
+
+      </article>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .content {
+    max-width: 700px;
+    margin-inline: auto;
+  }
+
+  .page-header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+  }
+
+  .prose {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .prose h2 {
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-xs);
+    color: var(--color-navy);
+  }
+
+  .prose h2:first-of-type {
+    margin-top: 0;
+  }
+
+  .prose p {
+    line-height: 1.8;
+    color: var(--color-navy);
+    font-size: 1.0625rem;
+  }
+
+  .ochre {
+    color: var(--color-ochre);
+    font-style: italic;
+    font-family: var(--font-heading);
+  }
+</style>
