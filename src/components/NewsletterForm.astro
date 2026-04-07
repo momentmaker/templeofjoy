@@ -3,9 +3,7 @@
 
 <form
   class="newsletter-form"
-  data-listmonk-url={import.meta.env.LISTMONK_API_URL}
-  data-listmonk-uuid={import.meta.env.LISTMONK_LIST_UUID}
-  novalidate
+  data-subscribe-url="https://submit.templeofjoy.org/subscribe"
 >
   <div class="newsletter-fields">
     <input
@@ -94,8 +92,7 @@
   const forms = document.querySelectorAll<HTMLFormElement>('.newsletter-form');
 
   forms.forEach((form) => {
-    const url = form.dataset.listmonkUrl;
-    const listUuid = form.dataset.listmonkUuid;
+    const subscribeUrl = form.dataset.subscribeUrl;
     const status = form.querySelector<HTMLParagraphElement>('.newsletter-status')!;
     const btn = form.querySelector<HTMLButtonElement>('.newsletter-btn')!;
 
@@ -111,10 +108,10 @@
       status.className = 'newsletter-status';
 
       try {
-        const res = await fetch(`${url}/api/public/subscription`, {
+        const res = await fetch(subscribeUrl!, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, list_uuids: [listUuid] }),
+          body: JSON.stringify({ email }),
         });
 
         if (res.ok) {
