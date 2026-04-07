@@ -1,0 +1,117 @@
+---
+import { formatTag } from '../data/tags';
+
+interface Props {
+  slug: string;
+  displayName: string;
+  country: string;
+  city: string;
+  stateRegion: string;
+  categories: string[];
+  tags: string[];
+  description: string;
+  photo?: string;
+}
+
+const { slug, displayName, country, city, stateRegion, categories, tags, description, photo } = Astro.props;
+
+const location = [city, stateRegion, country].filter(Boolean).join(', ');
+const topTags = tags.slice(0, 3);
+const searchable = [displayName, country, city, stateRegion, ...tags.map(formatTag)].join(' ').toLowerCase();
+---
+
+<a
+  href={`/directory/${slug}/`}
+  class="listing-card"
+  data-categories={categories.join(',')}
+  data-tags={tags.join(',')}
+  data-country={country}
+  data-searchable={searchable}
+>
+  <div class="card-photo">
+    <img
+      src={photo ?? '/default-avatar.svg'}
+      alt={displayName}
+      width="80"
+      height="80"
+    />
+  </div>
+  <div class="card-body">
+    <h3 class="card-name">{displayName}</h3>
+    <p class="card-location">{location}</p>
+    <p class="card-description">{description}</p>
+    <div class="card-tags">
+      {topTags.map((tag) => (
+        <span class="tag">{formatTag(tag)}</span>
+      ))}
+    </div>
+  </div>
+</a>
+
+<style>
+  .listing-card {
+    display: flex;
+    gap: var(--space-md);
+    background: var(--color-white);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-card);
+    text-decoration: none;
+    color: var(--color-navy);
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .listing-card:hover {
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+    color: var(--color-navy);
+  }
+
+  .card-photo {
+    flex-shrink: 0;
+  }
+
+  .card-photo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-stone);
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    min-width: 0;
+  }
+
+  .card-name {
+    font-size: 1.125rem;
+    margin: 0;
+  }
+
+  .card-location {
+    font-size: 0.875rem;
+    color: var(--color-sage);
+    margin: 0;
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--color-navy);
+    margin: var(--space-xs) 0;
+  }
+
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+  }
+</style>

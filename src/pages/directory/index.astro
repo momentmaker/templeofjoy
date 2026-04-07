@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ListingCard from '../../components/ListingCard.astro';
+
+const allDevotees = await getCollection('devotees');
+const devotees = allDevotees.sort(
+  (a, b) => b.data.dateAdded.getTime() - a.data.dateAdded.getTime()
+);
+---
+
+<BaseLayout
+  title="Directory"
+  description="Browse devotees of Paramhansa Yogananda offering practice, creative, and service gifts."
+>
+  <section class="section">
+    <div class="container">
+      <header class="directory-header">
+        <h1>Community Directory</h1>
+        <p class="directory-subtitle">
+          Devotees sharing their gifts across the world
+        </p>
+      </header>
+
+      <div class="grid" id="directory-grid">
+        {devotees.map((devotee) => (
+          <ListingCard
+            slug={devotee.id}
+            displayName={devotee.data.displayName}
+            country={devotee.data.country}
+            city={devotee.data.city}
+            stateRegion={devotee.data.stateRegion}
+            categories={devotee.data.categories}
+            tags={devotee.data.tags}
+            description={devotee.data.description}
+            photo={devotee.data.photo}
+          />
+        ))}
+      </div>
+
+      <div class="no-results" id="no-results" aria-hidden="true" hidden>
+        <p>No devotees found matching your filters.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .directory-header {
+    margin-bottom: var(--space-2xl);
+    text-align: center;
+  }
+
+  .directory-subtitle {
+    margin-top: var(--space-sm);
+    color: var(--color-sage);
+    font-size: 1.125rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: var(--space-3xl) 0;
+    color: var(--color-sage);
+    font-size: 1.125rem;
+  }
+
+  @media (max-width: 768px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
