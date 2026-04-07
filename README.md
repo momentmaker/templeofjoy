@@ -2,13 +2,13 @@
 
 **Joy expressed through service**
 
-A community directory for devotees of Paramhansa Yogananda across all lineages -- celebrating how they serve the world through practice, creativity, and heartfelt service.
+A community of Yogananda's devotees offering their gifts to the world -- through practice, creativity, and service.
 
 [templeofjoy.org](https://templeofjoy.org)
 
 ## What is this?
 
-Temple of Joy is a living directory where devotees can share their gifts with the community. Whether you teach meditation, create devotional art, offer healing, or serve in any other way -- your offering belongs here.
+Temple of Joy is a community where devotees can share their gifts with the world. Whether you teach meditation, create devotional art, offer healing, or serve in any other way -- your offering belongs here.
 
 The name carries a meaning: *temple* is the body, the vessel through which we serve. *Joy* is the essence we share when we offer ourselves fully to others.
 
