@@ -45,6 +45,10 @@ export default {
       );
     }
 
+    const cleaned = Object.fromEntries(
+      Object.entries(submission).filter(([, v]) => v !== '' && v != null)
+    );
+
     const res = await fetch(
       'https://api.github.com/repos/momentmaker/templeofjoy/dispatches',
       {
@@ -56,14 +60,16 @@ export default {
         },
         body: JSON.stringify({
           event_type: 'new-listing',
-          client_payload: submission,
+          client_payload: { submission: JSON.stringify(cleaned) },
         }),
       },
     );
 
     if (!res.ok) {
+      const errorBody = await res.text();
+      console.error(`GitHub API ${res.status}: ${errorBody}`);
       return Response.json(
-        { error: 'Failed to create listing' },
+        { error: 'Failed to create listing', status: res.status, detail: errorBody },
         { status: 502, headers: corsHeaders(request) },
       );
     }

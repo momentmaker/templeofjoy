@@ -26,7 +26,8 @@ jobs:
         with:
           script: |
             const raw = process.env.SUBMISSION_JSON;
-            const data = raw ? JSON.parse(raw) : JSON.parse(JSON.stringify(context.payload.client_payload));
+            const payload = context.payload.client_payload;
+            const data = raw ? JSON.parse(raw) : JSON.parse(payload.submission || JSON.stringify(payload));
 
             const baseSlug = data.displayName
               .toLowerCase()
