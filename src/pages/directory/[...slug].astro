@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatTag } from '../../data/tags';
+import { getInitials, getAvatarColor } from '../../data/avatar';
 
 export async function getStaticPaths() {
   const devotees = await getCollection('devotees');
@@ -28,6 +29,9 @@ function contactHref(method: string, value: string): string {
   return value;
 }
 
+const initials = getInitials(data.displayName);
+const avatarColor = getAvatarColor(data.displayName);
+
 const availableForLabels: Record<string, string> = {
   'in-person': 'In Person',
   virtual: 'Virtual',
@@ -43,13 +47,19 @@ const availableForLabels: Record<string, string> = {
 
       <div class="profile-header">
         <div class="profile-photo-wrap">
-          <img
-            src={data.photo ?? '/default-avatar.svg'}
-            alt={data.displayName}
-            class="profile-photo"
-            width="160"
-            height="160"
-          />
+          {data.photo ? (
+            <img
+              src={data.photo}
+              alt={data.displayName}
+              class="profile-photo"
+              width="160"
+              height="160"
+            />
+          ) : (
+            <div class="profile-avatar" style={`background: ${avatarColor.bg}; color: ${avatarColor.text};`}>
+              {initials}
+            </div>
+          )}
         </div>
         <div class="profile-meta">
           <h1 class="profile-name">{data.displayName}</h1>
@@ -184,6 +194,19 @@ const availableForLabels: Record<string, string> = {
     border-radius: 50%;
     object-fit: cover;
     border: 3px solid var(--color-gold);
+  }
+
+  .profile-avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 3.5rem;
+    font-weight: 600;
+    letter-spacing: 2px;
   }
 
   .profile-meta {

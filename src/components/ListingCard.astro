@@ -1,5 +1,6 @@
 ---
 import { formatTag } from '../data/tags';
+import { getInitials, getAvatarColor } from '../data/avatar';
 
 interface Props {
   slug: string;
@@ -18,6 +19,8 @@ const { slug, displayName, country, city, stateRegion, categories, tags, descrip
 const location = [city, stateRegion, country].filter(Boolean).join(', ');
 const topTags = tags.slice(0, 3);
 const searchable = [displayName, description, country, city, stateRegion, ...tags.map(formatTag)].join(' ').toLowerCase();
+const initials = getInitials(displayName);
+const avatarColor = getAvatarColor(displayName);
 ---
 
 <a
@@ -29,12 +32,13 @@ const searchable = [displayName, description, country, city, stateRegion, ...tag
   data-searchable={searchable}
 >
   <div class="card-photo">
-    <img
-      src={photo ?? '/default-avatar.svg'}
-      alt={displayName}
-      width="80"
-      height="80"
-    />
+    {photo ? (
+      <img src={photo} alt={displayName} width="80" height="80" />
+    ) : (
+      <div class="avatar-initials" style={`background: ${avatarColor.bg}; color: ${avatarColor.text};`}>
+        {initials}
+      </div>
+    )}
   </div>
   <div class="card-body">
     <h3 class="card-name">{displayName}</h3>
@@ -77,6 +81,19 @@ const searchable = [displayName, description, country, city, stateRegion, ...tag
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--color-stone);
+  }
+
+  .avatar-initials {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
 
   .card-body {
