@@ -23,20 +23,18 @@ const recentListings = [...allDevotees]
 ---
 
 <BaseLayout
-  title="Temple of Joy — A Directory for Yogananda's Devotees"
-  description="A community directory for devotees of Paramhansa Yogananda sharing their gifts through practice, creativity, and service."
+  title="Temple of Joy — A Gathering of Yogananda's Devotees"
+  description="A gathering of devotees of Paramhansa Yogananda sharing their gifts through practice, creativity, and service."
 >
   <section class="hero">
     <div class="container hero-inner">
       <h1 class="hero-title">Temple of Joy</h1>
       <p class="hero-tagline">Joy expressed through service</p>
       <p class="hero-description">
-        A living directory of devotees of Paramhansa Yogananda sharing their
-        gifts with the world — through practice, creative expression, and
-        heartfelt service.
+        Welcome. You've found a gathering of Yogananda's devotees sharing their gifts with the world.
       </p>
       <div class="hero-actions">
-        <a href="/directory/" class="btn btn-primary">Browse Directory</a>
+        <a href="/community/" class="btn btn-primary">Meet the Community</a>
         <a href="/submit/" class="btn btn-outline">Share Your Gifts</a>
       </div>
     </div>
@@ -49,7 +47,7 @@ const recentListings = [...allDevotees]
           <p class="quote-text">&ldquo;{featuredQuoteDevotee.data.guidingQuote}&rdquo;</p>
           <footer class="quote-attribution">
             &mdash;{' '}
-            <a href={`/directory/${featuredQuoteDevotee.id}/`} class="quote-link">
+            <a href={`/community/${featuredQuoteDevotee.id}/`} class="quote-link">
               {featuredQuoteDevotee.data.displayName}
             </a>
           </footer>
@@ -62,7 +60,7 @@ const recentListings = [...allDevotees]
     <section class="listings-section section">
       <div class="container">
         <header class="section-header">
-          <h2>Recent Listings</h2>
+          <h2>From the Community</h2>
           <p class="section-subtitle">Devotees sharing their gifts across the world</p>
         </header>
         <div class="listings-grid">
@@ -81,7 +79,7 @@ const recentListings = [...allDevotees]
           ))}
         </div>
         <div class="section-footer">
-          <a href="/directory/" class="btn btn-outline">View All Listings</a>
+          <a href="/community/" class="btn btn-outline">See Everyone</a>
         </div>
       </div>
     </section>
@@ -97,7 +95,7 @@ const recentListings = [...allDevotees]
           <p class="story-text">{featuredStoryDevotee.data.joyInAction}</p>
           <p class="story-attribution">
             &mdash;{' '}
-            <a href={`/directory/${featuredStoryDevotee.id}/`} class="story-link">
+            <a href={`/community/${featuredStoryDevotee.id}/`} class="story-link">
               {featuredStoryDevotee.data.displayName}
             </a>
           </p>

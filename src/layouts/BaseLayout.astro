@@ -9,7 +9,7 @@ interface Props {
   ogImage?: string;
 }
 
-const { title, description = 'A community directory for devotees of Paramhansa Yogananda. Joy expressed through service.', ogImage = '/og-image.png' } = Astro.props;
+const { title, description = 'A community of devotees of Paramhansa Yogananda sharing their gifts. Joy expressed through service.', ogImage = '/og-image.png' } = Astro.props;
 const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 ---
