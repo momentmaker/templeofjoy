@@ -83,14 +83,37 @@ async function handleSubscribe(request, env) {
     );
   }
 
-  const res = await fetch(`${env.LISTMONK_URL}/api/public/subscription`, {
+  const auth = btoa(`${env.LISTMONK_USER}:${env.LISTMONK_PASS}`);
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Basic ${auth}`,
+  };
+  const listId = parseInt(env.LISTMONK_LIST_ID);
+
+  const createRes = await fetch(`${env.LISTMONK_URL}/api/subscribers`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify({
       email: body.email,
-      list_uuids: [env.LISTMONK_LIST_UUID],
+      name: body.email.split('@')[0],
+      status: 'enabled',
+      lists: [listId],
+      preconfirm_subscriptions: true,
     }),
   });
+
+  if (!createRes.ok) {
+    const text = await createRes.text();
+    if (!text.includes('already exists')) {
+      console.error(`Listmonk create ${createRes.status}: ${text}`);
+      return Response.json(
+        { error: 'Subscription failed' },
+        { status: 502, headers: corsHeaders(request) },
+      );
+    }
+  }
+
+  const res = createRes;
 
   if (!res.ok) {
     const errorBody = await res.text();
