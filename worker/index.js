@@ -104,20 +104,10 @@ async function handleSubscribe(request, env) {
 
   if (!createRes.ok) {
     const text = await createRes.text();
-    if (!text.includes('already exists')) {
-      console.error(`Listmonk create ${createRes.status}: ${text}`);
-      return Response.json(
-        { error: 'Subscription failed' },
-        { status: 502, headers: corsHeaders(request) },
-      );
+    if (text.includes('already exists')) {
+      return Response.json({ ok: true }, { headers: corsHeaders(request) });
     }
-  }
-
-  const res = createRes;
-
-  if (!res.ok) {
-    const errorBody = await res.text();
-    console.error(`Listmonk API ${res.status}: ${errorBody}`);
+    console.error(`Listmonk API ${createRes.status}: ${text}`);
     return Response.json(
       { error: 'Subscription failed' },
       { status: 502, headers: corsHeaders(request) },
