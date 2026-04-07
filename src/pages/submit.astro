@@ -2,6 +2,12 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { countries } from '../data/countries';
 import { tagsByCategory, formatTag } from '../data/tags';
+
+const categoryEmoji: Record<string, string> = {
+  Practice: '◆',
+  Creative: '✦',
+  Service: '♡',
+};
 ---
 
 <BaseLayout
@@ -17,37 +23,61 @@ import { tagsByCategory, formatTag } from '../data/tags';
         </p>
       </header>
 
+      <div class="progress-bar-wrap" aria-label="Form progress">
+        <div class="progress-segments">
+          {[0, 1, 2, 3].map((i) => (
+            <div class="progress-segment" data-step-segment={i} />
+          ))}
+        </div>
+        <div class="progress-labels">
+          <span data-step-label="0">About You</span>
+          <span data-step-label="1">Your Path</span>
+          <span data-step-label="2">Offerings</span>
+          <span data-step-label="3">Connect</span>
+        </div>
+      </div>
+
       <form
         id="submit-form"
         class="listing-form"
         data-submit-url="https://submit.templeofjoy.org"
+        novalidate
       >
-        <fieldset class="form-section">
-          <legend>About You</legend>
+        <!-- Step 1: About You -->
+        <div class="step-card" data-step="0">
+          <div class="step-header">
+            <h2 class="step-title">About You</h2>
+            <p class="step-micro">Every journey begins with a name...</p>
+          </div>
 
           <div class="field">
             <label for="displayName">Display Name <span class="required">*</span></label>
-            <input type="text" id="displayName" name="displayName" required />
+            <input type="text" id="displayName" name="displayName" placeholder="How you'd like to appear in the directory" />
           </div>
 
           <div class="field">
             <label for="country">Country <span class="required">*</span></label>
-            <select id="country" name="country" required>
-              <option value="">Select your country</option>
-              {countries.map((c) => (
-                <option value={c}>{c}</option>
-              ))}
-            </select>
+            <div class="select-wrap">
+              <select id="country" name="country">
+                <option value="">Select your country</option>
+                {countries.map((c) => (
+                  <option value={c}>{c}</option>
+                ))}
+              </select>
+              <svg class="select-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M4 6l4 4 4-4" stroke="#073763" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
           </div>
 
           <div class="field-row">
             <div class="field">
               <label for="city">City</label>
-              <input type="text" id="city" name="city" />
+              <input type="text" id="city" name="city" placeholder="Your city" />
             </div>
             <div class="field">
               <label for="stateRegion">State / Region</label>
-              <input type="text" id="stateRegion" name="stateRegion" />
+              <input type="text" id="stateRegion" name="stateRegion" placeholder="State or region" />
             </div>
           </div>
 
@@ -64,68 +94,85 @@ import { tagsByCategory, formatTag } from '../data/tags';
           <div class="field">
             <label for="photoUrl">Photo URL</label>
             <input type="url" id="photoUrl" name="photoUrl" placeholder="https://" />
-            <p class="field-hint">
-              Paste a link to a photo hosted online, or email us a photo after submitting.
-            </p>
+            <p class="field-hint">Paste a link to a photo hosted online, or email us a photo after submitting.</p>
           </div>
-        </fieldset>
 
-        <fieldset class="form-section">
-          <legend>Your Path</legend>
+          <div class="step-nav step-nav--first">
+            <button type="button" class="btn-continue" data-nav="next">
+              Continue <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Your Path -->
+        <div class="step-card" data-step="1" hidden>
+          <div class="step-header">
+            <h2 class="step-title">Your Path</h2>
+            <p class="step-micro">Share the path that brought you here...</p>
+          </div>
 
           <div class="field">
             <label for="connectionToTeachings">
               Your connection to the teachings <span class="required">*</span>
             </label>
-            <textarea id="connectionToTeachings" name="connectionToTeachings" rows="5" required></textarea>
+            <textarea id="connectionToTeachings" name="connectionToTeachings" rows="5" placeholder="How did these teachings find you? What has your journey looked like?"></textarea>
           </div>
 
           <div class="field">
-            <label for="guidingQuote">A guiding quote (optional)</label>
+            <label for="guidingQuote">A guiding quote <span class="optional">(optional)</span></label>
             <textarea id="guidingQuote" name="guidingQuote" rows="2" placeholder="A line from scripture, Master's words, or your own heart"></textarea>
           </div>
-        </fieldset>
 
-        <fieldset class="form-section">
-          <legend>Your Offerings</legend>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-nav="prev">← Back</button>
+            <button type="button" class="btn-continue" data-nav="next">
+              Continue <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Your Offerings -->
+        <div class="step-card" data-step="2" hidden>
+          <div class="step-header">
+            <h2 class="step-title">Your Offerings</h2>
+            <p class="step-micro">What gifts do you bring to the world?</p>
+          </div>
 
           <div class="field">
-            <fieldset class="inline-fieldset">
-              <legend>Categories <span class="required">*</span></legend>
-              <div class="checkbox-group">
-                {(['Practice', 'Creative', 'Service'] as const).map((cat) => (
-                  <label class="checkbox-label">
-                    <input
-                      type="checkbox"
-                      name="categories"
-                      value={cat}
-                      data-category-toggle={cat}
-                    />
-                    {cat}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <p class="field-label">Categories <span class="required">*</span></p>
+            <div class="pill-group" id="category-pills">
+              {(['Practice', 'Creative', 'Service'] as const).map((cat) => (
+                <label class="pill pill--category">
+                  <input
+                    type="checkbox"
+                    name="categories"
+                    value={cat}
+                    data-category-toggle={cat}
+                    class="pill-input"
+                  />
+                  <span>{categoryEmoji[cat]} {cat}</span>
+                </label>
+              ))}
+            </div>
+            <p class="field-error" id="categories-error" hidden>Please select at least one category.</p>
           </div>
 
           {(['Practice', 'Creative', 'Service'] as const).map((cat) => (
             <div class="tag-group" id={`tags-${cat}`} hidden>
-              <fieldset class="inline-fieldset">
-                <legend>{cat} Tags</legend>
-                <div class="checkbox-group">
-                  {tagsByCategory[cat].map((tag) => (
-                    <label class="checkbox-label">
-                      <input type="checkbox" name="tags" value={tag} />
-                      {formatTag(tag)}
-                    </label>
-                  ))}
-                </div>
-              </fieldset>
+              <p class="field-label">{cat} Tags</p>
+              <div class="pill-group pill-group--tags">
+                {tagsByCategory[cat].map((tag) => (
+                  <label class="pill pill--tag">
+                    <input type="checkbox" name="tags" value={tag} class="pill-input" />
+                    <span>{formatTag(tag)}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           ))}
 
           <div class="field">
-            <label for="otherTags">Other tags</label>
+            <label for="otherTags">Other tags <span class="optional">(optional)</span></label>
             <input type="text" id="otherTags" name="otherTags" placeholder="Comma-separated" />
           </div>
 
@@ -133,11 +180,11 @@ import { tagsByCategory, formatTag } from '../data/tags';
             <label for="description">
               Describe your offerings <span class="required">*</span>
             </label>
-            <textarea id="description" name="description" rows="4" required></textarea>
+            <textarea id="description" name="description" rows="4" placeholder="What do you offer to the community?"></textarea>
           </div>
 
           <div class="field">
-            <label for="joyInAction">Joy in action — a story (optional)</label>
+            <label for="joyInAction">Joy in action — a story <span class="optional">(optional)</span></label>
             <textarea
               id="joyInAction"
               name="joyInAction"
@@ -147,41 +194,59 @@ import { tagsByCategory, formatTag } from '../data/tags';
           </div>
 
           <div class="field">
-            <fieldset class="inline-fieldset">
-              <legend>Available for</legend>
-              <div class="checkbox-group">
-                {(['in-person', 'virtual', 'travel', 'collaboration'] as const).map((opt) => (
-                  <label class="checkbox-label">
-                    <input type="checkbox" name="availableFor" value={opt} />
-                    {formatTag(opt)}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <p class="field-label">Available for <span class="optional">(optional)</span></p>
+            <div class="pill-group">
+              {(['in-person', 'virtual', 'travel', 'collaboration'] as const).map((opt) => (
+                <label class="pill pill--category">
+                  <input type="checkbox" name="availableFor" value={opt} class="pill-input" />
+                  <span>{formatTag(opt)}</span>
+                </label>
+              ))}
+            </div>
           </div>
 
           <div class="field">
-            <label class="checkbox-label standalone">
-              <input type="checkbox" name="openToMentorship" value="true" />
-              I am open to mentorship
+            <p class="field-label">Open to mentorship</p>
+            <label class="toggle-wrap">
+              <input type="checkbox" name="openToMentorship" value="true" class="toggle-input" id="openToMentorship" />
+              <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-label">I am open to mentorship</span>
             </label>
           </div>
-        </fieldset>
 
-        <fieldset class="form-section">
-          <legend>Contact</legend>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-nav="prev">← Back</button>
+            <button type="button" class="btn-continue" data-nav="next">
+              Continue <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 4: Connect -->
+        <div class="step-card" data-step="3" hidden>
+          <div class="step-header">
+            <h2 class="step-title">Connect</h2>
+            <p class="step-micro">How can the community reach you?</p>
+          </div>
 
           <div class="field-row">
             <div class="field">
               <label for="contactMethod">
                 Preferred contact method <span class="required">*</span>
               </label>
-              <select id="contactMethod" name="contactMethod" required>
-                <option value="">Select one</option>
-                <option value="website">Website</option>
-                <option value="email">Email</option>
-                <option value="social">Social profile</option>
-              </select>
+              <div class="select-wrap">
+                <select id="contactMethod" name="contactMethod">
+                  <option value="">Select one</option>
+                  <option value="website">Website</option>
+                  <option value="email">Email</option>
+                  <option value="social">Social profile</option>
+                </select>
+                <svg class="select-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M4 6l4 4 4-4" stroke="#073763" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
             </div>
             <div class="field">
               <label for="contactValue">
@@ -191,19 +256,18 @@ import { tagsByCategory, formatTag } from '../data/tags';
                 type="text"
                 id="contactValue"
                 name="contactValue"
-                required
                 placeholder="URL, email address, or handle"
               />
             </div>
           </div>
 
           <div class="field">
-            <label for="websiteUrl">Website URL</label>
+            <label for="websiteUrl">Website URL <span class="optional">(optional)</span></label>
             <input type="url" id="websiteUrl" name="websiteUrl" placeholder="https://" />
           </div>
 
           <div class="additional-links">
-            <p class="field-label">Additional links (optional)</p>
+            <p class="field-label">Additional links <span class="optional">(optional)</span></p>
             {[1, 2, 3, 4].map((n) => (
               <div class="link-row">
                 <input type="text" name={`link${n}Label`} placeholder={`Label ${n}`} />
@@ -211,22 +275,27 @@ import { tagsByCategory, formatTag } from '../data/tags';
               </div>
             ))}
           </div>
-        </fieldset>
 
-        <fieldset class="form-section">
-          <legend>Existing Listing</legend>
-          <label class="checkbox-label standalone">
-            <input type="checkbox" name="isUpdate" value="true" />
-            I am updating an existing listing
-          </label>
-        </fieldset>
+          <div class="field field--checkbox">
+            <label class="toggle-wrap toggle-wrap--inline">
+              <input type="checkbox" name="isUpdate" value="true" class="toggle-input" id="isUpdate" />
+              <span class="toggle-track" aria-hidden="true">
+                <span class="toggle-thumb"></span>
+              </span>
+              <span class="toggle-label">I am updating an existing listing</span>
+            </label>
+          </div>
 
-        <div id="form-error" class="form-error" hidden>
-          <p>Something went wrong. Please try again or email us directly.</p>
-        </div>
+          <div id="form-error" class="form-error" hidden>
+            <p>Something went wrong. Please try again or email us directly.</p>
+          </div>
 
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Submit Listing</button>
+          <div class="step-nav">
+            <button type="button" class="btn-back" data-nav="prev">← Back</button>
+            <button type="submit" class="btn-submit">
+              Share Your Gifts <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       </form>
 
@@ -246,7 +315,7 @@ import { tagsByCategory, formatTag } from '../data/tags';
   }
 
   .page-header {
-    margin-bottom: var(--space-2xl);
+    margin-bottom: var(--space-xl);
     text-align: center;
   }
 
@@ -256,36 +325,109 @@ import { tagsByCategory, formatTag } from '../data/tags';
     font-size: 1.0625rem;
   }
 
-  .listing-form {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2xl);
+  /* ── Progress bar ── */
+
+  .progress-bar-wrap {
+    margin-bottom: var(--space-2xl);
   }
 
-  .form-section {
-    border: 1px solid var(--color-gold);
-    border-radius: var(--radius-md);
-    padding: var(--space-xl);
+  .progress-segments {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .progress-segment {
+    height: 5px;
+    border-radius: 3px;
+    background: #C8B88A;
+    transition: background 0.3s ease;
+  }
+
+  .progress-segment.is-active,
+  .progress-segment.is-done {
+    background: #073763;
+  }
+
+  .progress-labels {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .progress-labels span {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #C8B88A;
+    transition: color 0.3s ease;
+  }
+
+  .progress-labels span.is-active,
+  .progress-labels span.is-done {
+    color: #073763;
+  }
+
+  /* ── Step card ── */
+
+  .step-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(7, 55, 99, 0.06);
+    padding: 32px;
+    animation: stepFadeIn 0.25s ease both;
+  }
+
+  @keyframes stepFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .step-header {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid #F0EBD8;
+  }
+
+  .step-title {
+    font-family: var(--font-heading);
+    font-size: 1.375rem;
+    font-weight: 700;
+    color: var(--color-navy);
+    margin: 0 0 4px;
+  }
+
+  .step-micro {
+    font-size: 0.9375rem;
+    color: var(--color-sage);
+    font-style: italic;
     margin: 0;
   }
 
-  .form-section legend {
-    font-family: var(--font-heading);
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--color-navy);
-    padding: 0 var(--space-sm);
-  }
+  /* ── Fields ── */
 
   .field {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: 6px;
     margin-top: var(--space-lg);
   }
 
   .field:first-of-type {
-    margin-top: var(--space-md);
+    margin-top: 0;
+  }
+
+  .field--checkbox {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid #F0EBD8;
   }
 
   .field-row {
@@ -301,97 +443,273 @@ import { tagsByCategory, formatTag } from '../data/tags';
 
   label {
     font-size: 0.9375rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-navy);
   }
 
   .field-label {
     font-size: 0.9375rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-navy);
-    margin-top: var(--space-lg);
-    margin-bottom: var(--space-sm);
+    margin: 0;
   }
 
   .required {
     color: var(--color-ochre);
   }
 
+  .optional {
+    font-weight: 400;
+    color: var(--color-sage);
+    font-size: 0.875rem;
+  }
+
+  .field-hint {
+    font-size: 0.8125rem;
+    color: var(--color-sage);
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* ── Inputs, selects, textareas ── */
+
   input[type='text'],
   input[type='url'],
   input[type='email'],
-  select,
   textarea {
     font-family: var(--font-body);
-    font-size: 0.9375rem;
-    border: 1px solid var(--color-gold);
-    border-radius: var(--radius-sm);
-    padding: var(--space-sm) var(--space-md);
-    background: var(--color-white);
+    font-size: 1rem;
+    border: 1.5px solid var(--color-gold);
+    border-radius: 10px;
+    padding: 12px 16px;
+    background: #FFFBEE;
     color: var(--color-navy);
-    transition: border-color 0.15s;
+    transition: border-color 0.2s, box-shadow 0.2s;
     width: 100%;
     box-sizing: border-box;
   }
 
-  input:focus,
-  select:focus,
+  input[type='text']::placeholder,
+  input[type='url']::placeholder,
+  input[type='email']::placeholder,
+  textarea::placeholder {
+    color: var(--color-sage);
+    font-style: italic;
+  }
+
+  input[type='text']:focus,
+  input[type='url']:focus,
+  input[type='email']:focus,
   textarea:focus {
     outline: none;
     border-color: var(--color-ochre);
-    box-shadow: 0 0 0 2px rgba(196, 118, 43, 0.15);
+    box-shadow: 0 0 0 3px rgba(196, 118, 43, 0.12);
   }
 
   textarea {
     resize: vertical;
   }
 
-  .field-hint {
-    font-size: 0.8125rem;
-    color: var(--color-sage);
-    margin: 0;
+  /* ── Select ── */
+
+  .select-wrap {
+    position: relative;
   }
 
-  .inline-fieldset {
-    border: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .inline-fieldset legend {
-    font-size: 0.9375rem;
-    font-weight: 500;
+  .select-wrap select {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    border: 1.5px solid var(--color-gold);
+    border-radius: 10px;
+    padding: 12px 40px 12px 16px;
+    background: #FFFBEE;
     color: var(--color-navy);
-    padding: 0;
-    margin-bottom: var(--space-sm);
+    width: 100%;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
   }
 
-  .checkbox-group {
+  .select-wrap select:focus {
+    outline: none;
+    border-color: var(--color-ochre);
+    box-shadow: 0 0 0 3px rgba(196, 118, 43, 0.12);
+  }
+
+  .select-chevron {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* ── Pill groups ── */
+
+  .pill-group {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-sm) var(--space-lg);
-    margin-top: var(--space-sm);
+    gap: 10px;
+    margin-top: 8px;
   }
 
-  .checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    font-size: 0.9375rem;
-    font-weight: 400;
+  .pill-group--tags {
+    gap: 8px;
+  }
+
+  .pill {
     cursor: pointer;
   }
 
-  .checkbox-label.standalone {
-    margin-top: var(--space-sm);
+  .pill-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
   }
+
+  .pill--category span {
+    display: inline-block;
+    background: #F8F6F1;
+    color: #7D8B6E;
+    border: 1.5px solid #C8B88A;
+    border-radius: 20px;
+    padding: 8px 20px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .pill--category input:checked + span {
+    background: #073763;
+    color: #FFFBEE;
+    border-color: #073763;
+  }
+
+  .pill--category:hover span {
+    border-color: #073763;
+    color: #073763;
+  }
+
+  .pill--category input:checked + span:hover {
+    color: #FFFBEE;
+  }
+
+  .pill--tag span {
+    display: inline-block;
+    background: transparent;
+    color: #7D8B6E;
+    border: 1.5px solid #C8B88A;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .pill--tag input:checked + span {
+    background: rgba(196, 118, 43, 0.1);
+    color: #C4762B;
+    border-color: #C4762B;
+  }
+
+  .pill--tag:hover span {
+    border-color: #C4762B;
+    color: #C4762B;
+  }
+
+  /* ── Tag groups (animate in) ── */
 
   .tag-group {
     margin-top: var(--space-md);
+    animation: tagGroupFadeIn 0.2s ease both;
   }
+
+  .tag-group .field-label {
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    color: var(--color-sage);
+    font-weight: 500;
+  }
+
+  @keyframes tagGroupFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ── Toggle switch ── */
+
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+  }
+
+  .toggle-wrap--inline {
+    display: inline-flex;
+  }
+
+  .toggle-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle-track {
+    display: inline-flex;
+    align-items: center;
+    width: 44px;
+    height: 24px;
+    border-radius: 12px;
+    background: #C8B88A;
+    padding: 2px;
+    transition: background 0.25s ease;
+    flex-shrink: 0;
+  }
+
+  .toggle-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s ease;
+  }
+
+  .toggle-input:checked ~ .toggle-track {
+    background: #C4762B;
+  }
+
+  .toggle-input:checked ~ .toggle-track .toggle-thumb {
+    transform: translateX(20px);
+  }
+
+  .toggle-label {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-navy);
+  }
+
+  /* ── Additional links ── */
 
   .additional-links {
     margin-top: var(--space-lg);
+  }
+
+  .additional-links .field-label {
+    margin-bottom: var(--space-sm);
   }
 
   .link-row {
@@ -401,19 +719,91 @@ import { tagsByCategory, formatTag } from '../data/tags';
     margin-bottom: var(--space-sm);
   }
 
+  /* ── Error states ── */
+
   .form-error {
     background: #fef2f2;
     border: 1px solid #fca5a5;
-    border-radius: var(--radius-sm);
+    border-radius: 10px;
     padding: var(--space-md);
     color: #b91c1c;
+    margin-top: var(--space-md);
   }
 
-  .form-actions {
-    display: flex;
-    justify-content: center;
-    padding-bottom: var(--space-lg);
+  .field-error {
+    font-size: 0.8125rem;
+    color: #b91c1c;
+    margin: 4px 0 0;
   }
+
+  /* ── Navigation buttons ── */
+
+  .step-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid #F0EBD8;
+  }
+
+  .step-nav--first {
+    justify-content: flex-end;
+  }
+
+  .btn-continue {
+    background: #073763;
+    color: #FFFBEE;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 32px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn-continue:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(7, 55, 99, 0.2);
+  }
+
+  .btn-submit {
+    background: #C4762B;
+    color: #FFFBEE;
+    border: none;
+    border-radius: 24px;
+    padding: 14px 40px;
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 4px rgba(196, 118, 43, 0.2), 0 4px 16px rgba(196, 118, 43, 0.3);
+  }
+
+  .btn-back {
+    background: none;
+    border: none;
+    color: #7D8B6E;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0;
+    transition: color 0.15s ease;
+  }
+
+  .btn-back:hover {
+    color: var(--color-ochre);
+  }
+
+  /* ── Thank you ── */
 
   .thank-you {
     text-align: center;
@@ -421,7 +811,7 @@ import { tagsByCategory, formatTag } from '../data/tags';
   }
 
   .thank-you h2 {
-    color: var(--color-navy);
+    color: var(--color-ochre);
     margin-bottom: var(--space-md);
   }
 
@@ -431,7 +821,13 @@ import { tagsByCategory, formatTag } from '../data/tags';
     font-size: 1.0625rem;
   }
 
+  /* ── Responsive ── */
+
   @media (max-width: 600px) {
+    .step-card {
+      padding: 24px 20px;
+    }
+
     .field-row {
       grid-template-columns: 1fr;
     }
@@ -443,27 +839,129 @@ import { tagsByCategory, formatTag } from '../data/tags';
 </style>
 
 <script>
-  const categoryToggles = document.querySelectorAll<HTMLInputElement>('[data-category-toggle]');
+  const STEPS = 4;
+  let currentStep = 0;
 
-  categoryToggles.forEach((checkbox) => {
+  const stepCards = Array.from(
+    document.querySelectorAll<HTMLDivElement>('[data-step]')
+  );
+  const segments = Array.from(
+    document.querySelectorAll<HTMLDivElement>('[data-step-segment]')
+  );
+  const labels = Array.from(
+    document.querySelectorAll<HTMLSpanElement>('[data-step-label]')
+  );
+  const form = document.getElementById('submit-form') as HTMLFormElement | null;
+  const thankYou = document.getElementById('thank-you') as HTMLElement | null;
+  const formError = document.getElementById('form-error') as HTMLElement | null;
+
+  function showStep(index: number): void {
+    stepCards.forEach((card, i) => {
+      card.hidden = i !== index;
+    });
+    segments.forEach((seg, i) => {
+      seg.classList.toggle('is-done', i < index);
+      seg.classList.toggle('is-active', i === index);
+    });
+    labels.forEach((lbl, i) => {
+      lbl.classList.toggle('is-done', i < index);
+      lbl.classList.toggle('is-active', i === index);
+    });
+  }
+
+  function validateStep(index: number): boolean {
+    if (index === 0) {
+      const name = (form?.elements.namedItem('displayName') as HTMLInputElement)?.value.trim();
+      const country = (form?.elements.namedItem('country') as HTMLSelectElement)?.value;
+      return Boolean(name && country);
+    }
+    if (index === 1) {
+      const connection = (form?.elements.namedItem('connectionToTeachings') as HTMLTextAreaElement)?.value.trim();
+      return Boolean(connection);
+    }
+    if (index === 2) {
+      const checked = form?.querySelectorAll<HTMLInputElement>('input[name="categories"]:checked');
+      return Boolean(checked && checked.length > 0);
+    }
+    if (index === 3) {
+      const method = (form?.elements.namedItem('contactMethod') as HTMLSelectElement)?.value;
+      const value = (form?.elements.namedItem('contactValue') as HTMLInputElement)?.value.trim();
+      return Boolean(method && value);
+    }
+    return true;
+  }
+
+  function getValidationHint(index: number): string {
+    if (index === 0) return 'Please fill in your display name and country.';
+    if (index === 1) return 'Please share your connection to the teachings.';
+    if (index === 2) return 'Please select at least one category.';
+    if (index === 3) return 'Please fill in your preferred contact method and value.';
+    return 'Please complete all required fields.';
+  }
+
+  function highlightMissing(index: number): void {
+    if (index === 0) {
+      const nameInput = form?.elements.namedItem('displayName') as HTMLInputElement;
+      const countrySelect = form?.elements.namedItem('country') as HTMLSelectElement;
+      if (!nameInput?.value.trim()) nameInput?.focus();
+      else if (!countrySelect?.value) countrySelect?.focus();
+    } else if (index === 1) {
+      const textarea = form?.elements.namedItem('connectionToTeachings') as HTMLTextAreaElement;
+      if (!textarea?.value.trim()) textarea?.focus();
+    } else if (index === 2) {
+      const catError = document.getElementById('categories-error');
+      if (catError) catError.hidden = false;
+    } else if (index === 3) {
+      const method = form?.elements.namedItem('contactMethod') as HTMLSelectElement;
+      const value = form?.elements.namedItem('contactValue') as HTMLInputElement;
+      if (!method?.value) method?.focus();
+      else if (!value?.value.trim()) value?.focus();
+    }
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-nav]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const direction = btn.dataset.nav;
+      if (direction === 'next') {
+        if (!validateStep(currentStep)) {
+          highlightMissing(currentStep);
+          return;
+        }
+        if (currentStep < STEPS - 1) {
+          currentStep++;
+          showStep(currentStep);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      } else if (direction === 'prev' && currentStep > 0) {
+        const catError = document.getElementById('categories-error');
+        if (catError) catError.hidden = true;
+        currentStep--;
+        showStep(currentStep);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  });
+
+  document.querySelectorAll<HTMLInputElement>('[data-category-toggle]').forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
       const cat = checkbox.dataset.categoryToggle;
       const tagGroup = document.getElementById(`tags-${cat}`);
       if (tagGroup) {
         tagGroup.hidden = !checkbox.checked;
       }
+      const catError = document.getElementById('categories-error');
+      if (catError) {
+        const anyChecked = form?.querySelectorAll<HTMLInputElement>('input[name="categories"]:checked').length ?? 0;
+        catError.hidden = anyChecked > 0;
+      }
     });
   });
-
-  const form = document.getElementById('submit-form') as HTMLFormElement | null;
-  const thankYou = document.getElementById('thank-you') as HTMLElement | null;
-  const formError = document.getElementById('form-error') as HTMLElement | null;
 
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    if (!form.checkValidity()) {
-      form.reportValidity();
+    if (!validateStep(3)) {
+      highlightMissing(3);
       return;
     }
 
@@ -494,7 +992,8 @@ import { tagsByCategory, formatTag } from '../data/tags';
       }
     } catch {
       if (formError) formError.hidden = false;
-      alert('Something went wrong submitting the form. Please try again.');
     }
   });
+
+  showStep(0);
 </script>
