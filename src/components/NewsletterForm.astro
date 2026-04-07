@@ -1,0 +1,136 @@
+---
+---
+
+<form
+  class="newsletter-form"
+  data-listmonk-url={import.meta.env.LISTMONK_API_URL}
+  data-listmonk-uuid={import.meta.env.LISTMONK_LIST_UUID}
+  novalidate
+>
+  <div class="newsletter-fields">
+    <input
+      type="email"
+      name="email"
+      placeholder="your@email.com"
+      required
+      class="newsletter-input"
+      aria-label="Email address"
+    />
+    <button type="submit" class="newsletter-btn">Subscribe</button>
+  </div>
+  <p class="newsletter-status" aria-live="polite"></p>
+</form>
+
+<style>
+  .newsletter-form {
+    margin-top: var(--space-md);
+  }
+
+  .newsletter-fields {
+    display: flex;
+    gap: var(--space-xs);
+  }
+
+  .newsletter-input {
+    flex: 1;
+    background: transparent;
+    border: 1px solid rgba(255, 251, 238, 0.4);
+    border-radius: 4px;
+    padding: var(--space-xs) var(--space-sm);
+    color: var(--color-cream);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .newsletter-input::placeholder {
+    color: rgba(255, 251, 238, 0.5);
+  }
+
+  .newsletter-input:focus {
+    border-color: var(--color-cream);
+  }
+
+  .newsletter-btn {
+    background: var(--color-ochre);
+    color: var(--color-navy);
+    border: none;
+    border-radius: 4px;
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.875rem;
+    font-family: var(--font-body);
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+
+  .newsletter-btn:hover {
+    opacity: 0.85;
+  }
+
+  .newsletter-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .newsletter-status {
+    margin-top: var(--space-xs);
+    font-size: 0.8rem;
+    min-height: 1.2em;
+  }
+
+  .newsletter-status.success {
+    color: var(--color-ochre);
+  }
+
+  .newsletter-status.error {
+    color: #f87171;
+  }
+</style>
+
+<script>
+  const forms = document.querySelectorAll<HTMLFormElement>('.newsletter-form');
+
+  forms.forEach((form) => {
+    const url = form.dataset.listmonkUrl;
+    const listUuid = form.dataset.listmonkUuid;
+    const status = form.querySelector<HTMLParagraphElement>('.newsletter-status')!;
+    const btn = form.querySelector<HTMLButtonElement>('.newsletter-btn')!;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = (form.querySelector<HTMLInputElement>('input[name="email"]')!).value.trim();
+
+      if (!email) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing…';
+      status.textContent = '';
+      status.className = 'newsletter-status';
+
+      try {
+        const res = await fetch(`${url}/api/public/subscription`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, list_uuids: [listUuid] }),
+        });
+
+        if (res.ok) {
+          status.textContent = 'Thank you! Check your inbox to confirm.';
+          status.classList.add('success');
+          form.reset();
+        } else {
+          throw new Error(`${res.status}`);
+        }
+      } catch {
+        status.textContent = 'Something went wrong. Please try again.';
+        status.classList.add('error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+      }
+    });
+  });
+</script>
