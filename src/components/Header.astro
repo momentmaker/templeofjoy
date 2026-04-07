@@ -1,0 +1,154 @@
+---
+const currentPath = Astro.url.pathname;
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/directory/', label: 'Directory' },
+  { href: '/submit/', label: 'Submit' },
+  { href: '/about/', label: 'About' },
+];
+---
+
+<header class="header">
+  <div class="container header-inner">
+    <a href="/" class="header-logo">
+      <span class="header-title">Temple of Joy</span>
+    </a>
+
+    <button class="mobile-menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+      <span class="hamburger"></span>
+    </button>
+
+    <nav class="header-nav" aria-label="Main navigation">
+      <ul class="nav-list">
+        {navLinks.map(({ href, label }) => (
+          <li>
+            <a
+              href={href}
+              class:list={['nav-link', { active: currentPath === href }]}
+            >
+              {label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-cream);
+    border-bottom: 1px solid var(--color-gold);
+    height: var(--header-height);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .header-logo {
+    text-decoration: none;
+  }
+
+  .header-title {
+    font-family: var(--font-heading);
+    font-size: 1.4rem;
+    color: var(--color-navy);
+  }
+
+  .nav-list {
+    display: flex;
+    list-style: none;
+    gap: var(--space-lg);
+  }
+
+  .nav-link {
+    text-decoration: none;
+    font-size: 0.95rem;
+    color: var(--color-navy);
+    padding: var(--space-xs) 0;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    border-bottom-color: var(--color-ochre);
+    color: var(--color-navy);
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--space-sm);
+  }
+
+  .hamburger,
+  .hamburger::before,
+  .hamburger::after {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--color-navy);
+    transition: transform 0.3s;
+  }
+
+  .hamburger {
+    position: relative;
+  }
+
+  .hamburger::before,
+  .hamburger::after {
+    content: '';
+    position: absolute;
+  }
+
+  .hamburger::before { top: -7px; }
+  .hamburger::after { top: 7px; }
+
+  @media (max-width: 768px) {
+    .mobile-menu-toggle {
+      display: block;
+    }
+
+    .header-nav {
+      display: none;
+      position: absolute;
+      top: var(--header-height);
+      left: 0;
+      right: 0;
+      background: var(--color-cream);
+      border-bottom: 1px solid var(--color-gold);
+      padding: var(--space-lg);
+    }
+
+    .header-nav.open {
+      display: block;
+    }
+
+    .nav-list {
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector('.mobile-menu-toggle');
+  const nav = document.querySelector('.header-nav');
+
+  toggle?.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    nav?.classList.toggle('open');
+  });
+</script>

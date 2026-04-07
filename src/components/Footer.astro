@@ -1,0 +1,101 @@
+---
+const currentYear = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <span class="footer-title">Temple of Joy</span>
+      <p class="footer-tagline">Joy expressed through service</p>
+    </div>
+
+    <div class="footer-links">
+      <a href="/directory/">Directory</a>
+      <a href="/submit/">Submit a Listing</a>
+      <a href="/about/">About</a>
+    </div>
+
+    <div class="footer-newsletter" id="newsletter-section">
+      <p class="footer-newsletter-label">Stay connected</p>
+      <p class="footer-newsletter-desc">Receive updates on new listings and community stories.</p>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {currentYear} Temple of Joy. Made with devotion.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--color-navy);
+    color: var(--color-cream);
+    padding: var(--space-3xl) 0 var(--space-lg);
+    margin-top: auto;
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-2xl);
+  }
+
+  .footer-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+  }
+
+  .footer-tagline {
+    color: var(--color-ochre);
+    font-style: italic;
+    font-family: var(--font-heading);
+    margin-top: var(--space-xs);
+    font-size: 0.9rem;
+  }
+
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .footer-links a {
+    color: var(--color-cream);
+    text-decoration: none;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .footer-links a:hover {
+    opacity: 1;
+    color: var(--color-cream);
+  }
+
+  .footer-newsletter-label {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+  }
+
+  .footer-newsletter-desc {
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  .footer-bottom {
+    grid-column: 1 / -1;
+    border-top: 1px solid rgba(255, 251, 238, 0.15);
+    padding-top: var(--space-lg);
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.6;
+  }
+
+  @media (max-width: 768px) {
+    .footer-inner {
+      grid-template-columns: 1fr;
+      gap: var(--space-xl);
+    }
+  }
+</style>
