@@ -2,6 +2,8 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ListingCard from '../../components/ListingCard.astro';
+import SearchBar from '../../components/SearchBar.astro';
+import FilterBar from '../../components/FilterBar.astro';
 
 const allDevotees = await getCollection('devotees');
 const devotees = allDevotees.sort(
@@ -21,6 +23,9 @@ const devotees = allDevotees.sort(
           Devotees sharing their gifts across the world
         </p>
       </header>
+
+      <SearchBar />
+      <FilterBar />
 
       <div class="grid" id="directory-grid">
         {devotees.map((devotee) => (
@@ -76,3 +81,66 @@ const devotees = allDevotees.sort(
     }
   }
 </style>
+
+<script>
+  const grid = document.getElementById('directory-grid');
+  const noResults = document.getElementById('no-results');
+  const searchInput = document.getElementById('directory-search') as HTMLInputElement | null;
+  const countrySelect = document.getElementById('filter-country') as HTMLSelectElement | null;
+  const tagSelect = document.getElementById('filter-tag') as HTMLSelectElement | null;
+  const categoryButtons = document.querySelectorAll<HTMLButtonElement>('[data-category]');
+
+  let activeCategory = 'all';
+
+  function applyFilters() {
+    if (!grid) return;
+
+    const searchQuery = searchInput?.value.trim().toLowerCase() ?? '';
+    const selectedCountry = countrySelect?.value ?? '';
+    const selectedTag = tagSelect?.value ?? '';
+
+    const cards = grid.querySelectorAll<HTMLElement>('.listing-card');
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+      const cardCategories = card.dataset.categories?.split(',') ?? [];
+      const cardTags = card.dataset.tags?.split(',') ?? [];
+      const cardCountry = card.dataset.country ?? '';
+      const cardSearchable = card.dataset.searchable ?? '';
+
+      const matchesCategory =
+        activeCategory === 'all' || cardCategories.includes(activeCategory.charAt(0).toUpperCase() + activeCategory.slice(1));
+
+      const matchesCountry = selectedCountry === '' || cardCountry === selectedCountry;
+
+      const matchesTag = selectedTag === '' || cardTags.includes(selectedTag);
+
+      const matchesSearch = searchQuery === '' || cardSearchable.includes(searchQuery);
+
+      const visible = matchesCategory && matchesCountry && matchesTag && matchesSearch;
+
+      card.hidden = !visible;
+      if (visible) visibleCount++;
+    });
+
+    if (noResults) {
+      noResults.hidden = visibleCount > 0;
+      noResults.setAttribute('aria-hidden', String(visibleCount > 0));
+    }
+  }
+
+  categoryButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      activeCategory = btn.dataset.category ?? 'all';
+
+      categoryButtons.forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      applyFilters();
+    });
+  });
+
+  searchInput?.addEventListener('input', applyFilters);
+  countrySelect?.addEventListener('change', applyFilters);
+  tagSelect?.addEventListener('change', applyFilters);
+</script>

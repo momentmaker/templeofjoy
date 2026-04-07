@@ -1,0 +1,78 @@
+---
+---
+
+<div class="search-bar-wrapper">
+  <label for="directory-search" class="sr-only">Search devotees</label>
+  <div class="search-input-wrap">
+    <svg class="search-icon" aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="11" cy="11" r="8"/>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <input
+      id="directory-search"
+      type="search"
+      class="search-input"
+      placeholder="Search by name, offering, or location..."
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+</div>
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .search-bar-wrapper {
+    margin-bottom: var(--space-md);
+  }
+
+  .search-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--space-md);
+    color: var(--color-sage);
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md) var(--space-sm) calc(var(--space-md) + 18px + var(--space-sm));
+    border: 1.5px solid var(--color-gold);
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-navy);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-input::placeholder {
+    color: var(--color-sage);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--color-navy);
+    box-shadow: 0 0 0 3px rgba(7, 55, 99, 0.08);
+  }
+
+  .search-input::-webkit-search-cancel-button {
+    cursor: pointer;
+  }
+</style>
