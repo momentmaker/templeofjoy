@@ -14,3 +14,6 @@ dist/
 
 # private conversation transcripts for Joy in Action workflow
 conversations/
+
+# private outreach templates and drafts
+outreach-templates.md
