@@ -11,3 +11,6 @@ dist/
 .dev.vars*
 !.dev.vars.example
 !.env.example
+
+# private conversation transcripts for Joy in Action workflow
+conversations/
