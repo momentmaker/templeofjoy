@@ -81,6 +81,27 @@ function photoCircleSvg(dataUri) {
   <image href="${dataUri}" x="100" y="180" width="200" height="200" clip-path="url(#avatar-clip)" preserveAspectRatio="xMidYMid slice"/>`;
 }
 
+function wrapText(text, maxChars, maxLines) {
+  const words = text.split(' ');
+  const lines = [];
+  let current = '';
+  for (const word of words) {
+    const test = current ? current + ' ' + word : word;
+    if (test.length > maxChars && current) {
+      lines.push(current);
+      if (lines.length >= maxLines) break;
+      current = word;
+    } else {
+      current = test;
+    }
+  }
+  if (current && lines.length < maxLines) lines.push(current);
+  if (lines.length === maxLines && text.length > lines.join(' ').length) {
+    lines[maxLines - 1] = lines[maxLines - 1].slice(0, maxChars - 3) + '...';
+  }
+  return lines;
+}
+
 const files = readdirSync(devoteesDir).filter(f => f.endsWith('.md'));
 
 for (const file of files) {
@@ -92,7 +113,7 @@ for (const file of files) {
   const color = getColor(name);
   const initials = getInitials(name);
   const description = data.description || '';
-  const truncDesc = description.length > 100 ? description.slice(0, 97) + '...' : description;
+  const descLines = wrapText(description, 65, 2);
 
   let avatarSvg;
   if (data.photo) {
@@ -111,7 +132,7 @@ for (const file of files) {
 
   <text x="380" y="240" font-family="Georgia, serif" font-size="48" font-weight="bold" fill="#073763">${escapeXml(name)}</text>
   <text x="380" y="285" font-family="Inter, system-ui, sans-serif" font-size="22" fill="#7D8B6E">${escapeXml(location)}</text>
-  <text x="380" y="370" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#073763" opacity="0.8">${escapeXml(truncDesc)}</text>
+  ${descLines.map((line, i) => `<text x="380" y="${370 + i * 28}" font-family="Inter, system-ui, sans-serif" font-size="20" fill="#073763" opacity="0.8">${escapeXml(line)}</text>`).join('\n  ')}
 
   <text x="380" y="540" font-family="Georgia, serif" font-size="24" fill="#073763">Temple of Joy</text>
   <text x="600" y="540" font-family="Georgia, serif" font-size="18" font-style="italic" fill="#C4762B">Joy expressed through service</text>
