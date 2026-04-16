@@ -4,7 +4,7 @@ country: "United States"
 city: "Austin"
 stateRegion: "TX"
 categories: ["Practice", "Service"]
-tags: ["spiritual-direction", "energy-healing", "counseling"]
+tags: ["intuitive-mediumship", "energy-healing", "counseling"]
 description: >-
   Intuitive medium and soul reader. I read the astral body like a map
   and turn it into a map for people's lives — showing them how to

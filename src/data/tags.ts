@@ -9,6 +9,7 @@ export const tagsByCategory: Record<Category, string[]> = {
     'kriya-instruction',
     'ayurveda',
     'energy-healing',
+    'intuitive-mediumship',
     'counseling',
     'spiritual-direction',
   ],
