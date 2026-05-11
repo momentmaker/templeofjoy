@@ -5,17 +5,17 @@ import ListingCard from '../components/ListingCard.astro';
 
 const allDevotees = await getCollection('devotees');
 
-const devoteesWithQuote = allDevotees.filter((d) => d.data.guidingQuote);
-const featuredQuoteDevotee =
-  devoteesWithQuote.length > 0
-    ? devoteesWithQuote[Math.floor(Math.random() * devoteesWithQuote.length)]
-    : null;
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
-const devoteesWithStory = allDevotees.filter((d) => d.data.joyInAction);
-const featuredStoryDevotee =
-  devoteesWithStory.length > 0
-    ? devoteesWithStory[Math.floor(Math.random() * devoteesWithStory.length)]
-    : null;
+const quoteDevotees = shuffle(allDevotees.filter((d) => d.data.guidingQuote));
+const storyDevotees = shuffle(allDevotees.filter((d) => d.data.joyInAction));
 
 const recentListings = [...allDevotees]
   .sort((a, b) => b.data.dateAdded.getTime() - a.data.dateAdded.getTime())
@@ -41,18 +41,47 @@ const recentListings = [...allDevotees]
     </div>
   </section>
 
-  {featuredQuoteDevotee && (
+  {quoteDevotees.length > 0 && (
     <section class="quote-section section">
-      <div class="container">
-        <blockquote class="featured-quote">
-          <p class="quote-text">&ldquo;{featuredQuoteDevotee.data.guidingQuote}&rdquo;</p>
-          <footer class="quote-attribution">
-            &mdash;{' '}
-            <a href={`/community/${featuredQuoteDevotee.id}/`} class="quote-link">
-              {featuredQuoteDevotee.data.displayName}
-            </a>
-          </footer>
-        </blockquote>
+      <div
+        class="container carousel"
+        data-carousel="quote"
+        data-count={quoteDevotees.length}
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Guiding quotes from devotees"
+      >
+        <div class="carousel-slides quote-slides">
+          {quoteDevotees.map((d, i) => (
+            <blockquote
+              class="featured-quote carousel-slide"
+              data-index={i}
+              aria-hidden={i === 0 ? 'false' : 'true'}
+            >
+              <p class="quote-text">&ldquo;{d.data.guidingQuote}&rdquo;</p>
+              <footer class="quote-attribution">
+                &mdash;{' '}
+                <a href={`/community/${d.id}/`} class="quote-link">
+                  {d.data.displayName}
+                </a>
+              </footer>
+            </blockquote>
+          ))}
+        </div>
+        {quoteDevotees.length > 1 && (
+          <div class="carousel-dots" role="tablist" aria-label="Choose a quote">
+            {quoteDevotees.map((d, i) => (
+              <button
+                type="button"
+                class="carousel-dot"
+                data-index={i}
+                role="tab"
+                aria-label={`Show quote from ${d.data.displayName}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   )}
@@ -86,20 +115,51 @@ const recentListings = [...allDevotees]
     </section>
   )}
 
-  {featuredStoryDevotee && (
+  {storyDevotees.length > 0 && (
     <section class="story-section section">
       <div class="container">
         <header class="section-header">
           <h2>Joy in Action</h2>
         </header>
-        <div class="story-box">
-          <p class="story-text">{featuredStoryDevotee.data.joyInAction}</p>
-          <p class="story-attribution">
-            &mdash;{' '}
-            <a href={`/community/${featuredStoryDevotee.id}/`} class="story-link">
-              {featuredStoryDevotee.data.displayName}
-            </a>
-          </p>
+        <div
+          class="carousel"
+          data-carousel="story"
+          data-count={storyDevotees.length}
+          role="region"
+          aria-roledescription="carousel"
+          aria-label="Joy in Action stories from devotees"
+        >
+          <div class="carousel-slides story-slides">
+            {storyDevotees.map((d, i) => (
+              <div
+                class="story-box carousel-slide"
+                data-index={i}
+                aria-hidden={i === 0 ? 'false' : 'true'}
+              >
+                <p class="story-text">{d.data.joyInAction}</p>
+                <p class="story-attribution">
+                  &mdash;{' '}
+                  <a href={`/community/${d.id}/`} class="story-link">
+                    {d.data.displayName}
+                  </a>
+                </p>
+              </div>
+            ))}
+          </div>
+          {storyDevotees.length > 1 && (
+            <div class="carousel-dots" role="tablist" aria-label="Choose a story">
+              {storyDevotees.map((d, i) => (
+                <button
+                  type="button"
+                  class="carousel-dot"
+                  data-index={i}
+                  role="tab"
+                  aria-label={`Show story from ${d.data.displayName}`}
+                  aria-selected={i === 0 ? 'true' : 'false'}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </section>
@@ -271,6 +331,81 @@ const recentListings = [...allDevotees]
     opacity: 0.85;
   }
 
+  .carousel {
+    position: relative;
+  }
+
+  .carousel-slides {
+    position: relative;
+  }
+
+  .quote-slides {
+    max-width: 620px;
+    margin-inline: auto;
+    min-height: 11rem;
+  }
+
+  .story-slides {
+    max-width: 680px;
+    margin-inline: auto;
+    min-height: 16rem;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 600ms ease-in-out;
+    pointer-events: none;
+  }
+
+  .carousel-slide[aria-hidden='false'] {
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+  }
+
+  .carousel-slide.featured-quote {
+    margin: 0;
+  }
+
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+
+  .carousel-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: var(--color-sage);
+    opacity: 0.35;
+    cursor: pointer;
+    transition: opacity 200ms ease, background 200ms ease, transform 200ms ease;
+  }
+
+  .carousel-dot:hover,
+  .carousel-dot:focus-visible {
+    opacity: 0.7;
+    outline: none;
+  }
+
+  .carousel-dot[aria-selected='true'] {
+    background: var(--color-ochre);
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-slide {
+      transition: none;
+    }
+  }
+
   @media (max-width: 768px) {
     .listings-grid {
       grid-template-columns: 1fr;
@@ -279,5 +414,70 @@ const recentListings = [...allDevotees]
     .story-box {
       padding: var(--space-lg);
     }
+
+    .quote-slides {
+      min-height: 13rem;
+    }
+
+    .story-slides {
+      min-height: 20rem;
+    }
   }
 </style>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const ROTATION_MS = 7000;
+
+  function initCarousel(root: HTMLElement) {
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('.carousel-slide'));
+    const dots = Array.from(root.querySelectorAll<HTMLButtonElement>('.carousel-dot'));
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    let timer: number | null = null;
+
+    function show(idx: number) {
+      slides.forEach((slide, i) => {
+        slide.setAttribute('aria-hidden', i === idx ? 'false' : 'true');
+      });
+      dots.forEach((dot, i) => {
+        dot.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+      });
+      current = idx;
+    }
+
+    function next() {
+      show((current + 1) % slides.length);
+    }
+
+    function start() {
+      if (reduceMotion || timer !== null) return;
+      timer = window.setInterval(next, ROTATION_MS);
+    }
+
+    function stop() {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+      }
+    }
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        stop();
+        show(i);
+        start();
+      });
+    });
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+
+    start();
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach(initCarousel);
+</script>
