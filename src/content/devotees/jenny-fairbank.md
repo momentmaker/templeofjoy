@@ -1,7 +1,7 @@
 ---
 displayName: "Jenny Fairbank"
 country: "United States"
-city: "Nevada City"
+city: "Dobbins"
 stateRegion: "CA"
 categories: ["Practice", "Service"]
 tags: ["counseling", "energy-healing", "intuitive-mediumship", "spiritual-direction", "event-hosting", "yoga"]
